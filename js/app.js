@@ -216,4 +216,169 @@ document.addEventListener('DOMContentLoaded', () => {
   // Animate attendance bars on initial load if attendance is visible
   animateAttendanceBars();
 
+  // ── API Fetch & Render Logic ──
+  
+  async function fetchAnnouncements() {
+    try {
+      const res = await fetch('/api/announcements');
+      if (!res.ok) return;
+      const data = await res.json();
+      const container = document.getElementById('dynamicAnnouncements');
+      if (!container) return;
+      container.innerHTML = '';
+      if (data.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No announcements yet.</p>';
+      }
+      data.forEach(ann => {
+        container.innerHTML += `
+          <div class="announcement-card">
+              <div class="ann-date">${ann.date} • ${ann.department}</div>
+              <div class="ann-title">${ann.title}</div>
+              <div class="ann-body">${ann.body}</div>
+              <span class="ann-tag ${ann.tag.toLowerCase()}">${ann.tag}</span>
+          </div>
+        `;
+      });
+    } catch (e) {
+      console.error('Error fetching announcements', e);
+    }
+  }
+
+  async function fetchNotes() {
+    try {
+      const res = await fetch('/api/notes');
+      if (!res.ok) return;
+      const data = await res.json();
+      const container = document.getElementById('dynamicNotes');
+      if (!container) return;
+      container.innerHTML = '';
+      if (data.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No notes uploaded yet.</p>';
+      }
+      data.forEach(note => {
+        container.innerHTML += `
+          <div class="note-card" data-dept-filter="${note.department}">
+              <div class="note-icon pdf"><span class="material-symbols-outlined">description</span></div>
+              <div class="note-details">
+                  <div class="note-name">${note.title}</div>
+                  <div class="note-meta"><span>${note.professor}</span><span>${note.file_size}</span><span>${note.upload_date}</span></div>
+              </div>
+              <a href="${note.file_path}" target="_blank" style="color: inherit; text-decoration: none;">
+                <span class="note-action material-symbols-outlined">download</span>
+              </a>
+          </div>
+        `;
+      });
+    } catch (e) {
+      console.error('Error fetching notes', e);
+    }
+  }
+
+  async function fetchVideos() {
+    try {
+      const res = await fetch('/api/videos');
+      if (!res.ok) return;
+      const data = await res.json();
+      const container = document.getElementById('dynamicVideos');
+      if (!container) return;
+      container.innerHTML = '';
+      if (data.length === 0) {
+        container.innerHTML = '<p style="color: var(--text-secondary);">No videos added yet.</p>';
+      }
+      data.forEach(video => {
+        container.innerHTML += `
+          <div class="note-card" data-dept-filter="${video.department}">
+              <div class="note-icon link"><span class="material-symbols-outlined">play_circle</span></div>
+              <div class="note-details">
+                  <div class="note-name">${video.title}</div>
+                  <div class="note-meta"><span>${video.description}</span><span>External Link</span><span>${video.upload_date}</span></div>
+              </div>
+              <a href="${video.url}" target="_blank" style="color: inherit; text-decoration: none;">
+                <span class="note-action material-symbols-outlined">open_in_new</span>
+              </a>
+          </div>
+        `;
+      });
+    } catch (e) {
+      console.error('Error fetching videos', e);
+    }
+  }
+
+  // Initial Fetch
+  fetchAnnouncements();
+  fetchNotes();
+  fetchVideos();
+
+  // Admin Form Submissions
+  const annForm = document.getElementById('adminAnnForm');
+  if (annForm) {
+    annForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = annForm.querySelector('button');
+      btn.classList.add('loading');
+      const payload = {
+        title: document.getElementById('annTitle').value,
+        body: document.getElementById('annBody').value,
+        department: document.getElementById('annDept').value,
+        tag: document.getElementById('annTag').value
+      };
+      await fetch('/api/announcements', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      annForm.reset();
+      btn.classList.remove('loading');
+      fetchAnnouncements();
+      alert('Announcement posted!');
+    });
+  }
+
+  const videoForm = document.getElementById('adminVideoForm');
+  if (videoForm) {
+    videoForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = videoForm.querySelector('button');
+      btn.classList.add('loading');
+      const payload = {
+        title: document.getElementById('videoTitle').value,
+        description: document.getElementById('videoDesc').value,
+        department: document.getElementById('videoDept').value,
+        url: document.getElementById('videoUrl').value
+      };
+      await fetch('/api/videos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+      videoForm.reset();
+      btn.classList.remove('loading');
+      fetchVideos();
+      alert('Video added!');
+    });
+  }
+
+  const noteForm = document.getElementById('adminNoteForm');
+  if (noteForm) {
+    noteForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = noteForm.querySelector('button');
+      btn.classList.add('loading');
+      const formData = new FormData();
+      formData.append('title', document.getElementById('noteTitle').value);
+      formData.append('professor', document.getElementById('noteProf').value);
+      formData.append('department', document.getElementById('noteDept').value);
+      formData.append('noteFile', document.getElementById('noteFile').files[0]);
+      
+      await fetch('/api/notes', {
+        method: 'POST',
+        body: formData // Note: no Content-Type header needed for FormData
+      });
+      noteForm.reset();
+      btn.classList.remove('loading');
+      fetchNotes();
+      alert('Note uploaded!');
+    });
+  }
+
 });

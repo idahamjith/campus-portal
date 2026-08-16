@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#4a6cf7">
     <link rel="apple-touch-icon" href="icon.svg">
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
@@ -47,6 +47,10 @@
             <div class="nav-item" data-page="notes" id="nav-notes">
                 <span class="material-symbols-outlined">description</span>
                 Notes & Resources
+            </div>
+            <div class="nav-item" data-page="videos" id="nav-videos">
+                <span class="material-symbols-outlined">video_library</span>
+                Video Lectures
             </div>
 
             <div class="nav-section-title" id="nav-admin-title" style="display: none;">Admin</div>
@@ -140,6 +144,43 @@
                                 <span class="btn-text">Send Broadcast</span>
                                 <span class="btn-loader"></span>
                             </button>
+                        </form>
+                    </div>
+
+                    <div class="stat-card" style="grid-column: span 12;">
+                        <h3>Create Announcement</h3>
+                        <form id="adminAnnForm" style="display: flex; flex-direction: column; gap: 12px;">
+                            <input type="text" id="annTitle" placeholder="Title" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <textarea id="annBody" placeholder="Message" required rows="3" style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%; resize: vertical;"></textarea>
+                            <input type="text" id="annDept" placeholder="Department (e.g. Computer Science)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <select id="annTag" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%; background: var(--bg-surface);">
+                                <option value="info">Info</option>
+                                <option value="urgent">Urgent</option>
+                                <option value="event">Event</option>
+                            </select>
+                            <button type="submit" class="login-btn" style="width: auto; align-self: flex-start; margin-top: 8px;"><span class="btn-text">Post Announcement</span></button>
+                        </form>
+                    </div>
+
+                    <div class="stat-card" style="grid-column: span 12;">
+                        <h3>Upload Note</h3>
+                        <form id="adminNoteForm" style="display: flex; flex-direction: column; gap: 12px;">
+                            <input type="text" id="noteTitle" placeholder="Document Title" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="text" id="noteProf" placeholder="Professor Name" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="text" id="noteDept" placeholder="Department (e.g. cs, mech)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="file" id="noteFile" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <button type="submit" class="login-btn" style="width: auto; align-self: flex-start; margin-top: 8px;"><span class="btn-text">Upload File</span></button>
+                        </form>
+                    </div>
+
+                    <div class="stat-card" style="grid-column: span 12;">
+                        <h3>Add Video Link</h3>
+                        <form id="adminVideoForm" style="display: flex; flex-direction: column; gap: 12px;">
+                            <input type="text" id="videoTitle" placeholder="Video Title" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="text" id="videoDesc" placeholder="Description" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="text" id="videoDept" placeholder="Department (e.g. cs, mech)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <input type="url" id="videoUrl" placeholder="Video URL (YouTube/Vimeo)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <button type="submit" class="login-btn" style="width: auto; align-self: flex-start; margin-top: 8px;"><span class="btn-text">Add Video</span></button>
                         </form>
                     </div>
                 </div>
@@ -258,25 +299,8 @@
                         <div class="section-subtitle">Latest updates from departments</div>
                     </div>
                 </div>
-                <div class="announcements-list stagger">
-                    <div class="announcement-card">
-                        <div class="ann-date">Aug 14, 2026 • Computer Science</div>
-                        <div class="ann-title">Mid-Semester Examination Schedule Released</div>
-                        <div class="ann-body">The mid-semester examination schedule for all CS courses has been released. Please check the department notice board for details.</div>
-                        <span class="ann-tag urgent">Urgent</span>
-                    </div>
-                    <div class="announcement-card">
-                        <div class="ann-date">Aug 13, 2026 • Mechanical Engineering</div>
-                        <div class="ann-title">Workshop on CAD/CAM — Registration Open</div>
-                        <div class="ann-body">A 2-day workshop on Advanced CAD/CAM will be held on Aug 20-21. Limited seats available. Register through the department portal.</div>
-                        <span class="ann-tag event">Event</span>
-                    </div>
-                    <div class="announcement-card">
-                        <div class="ann-date">Aug 12, 2026 • Administration</div>
-                        <div class="ann-title">Library Timings Extended</div>
-                        <div class="ann-body">The central library will now remain open until 10:00 PM on weekdays during the exam preparation period.</div>
-                        <span class="ann-tag info">Info</span>
-                    </div>
+                <div class="announcements-list stagger" id="dynamicAnnouncements">
+                    <!-- Dynamic announcements will be loaded here -->
                 </div>
             </div>
         </div>
@@ -536,95 +560,8 @@
                     <button class="dept-tab" data-dept="ece">Electronics</button>
                 </div>
 
-                <div class="notes-list stagger">
-                    <div class="note-card" data-dept-filter="cs">
-                        <div class="note-icon pdf"><span class="material-symbols-outlined">picture_as_pdf</span></div>
-                        <div class="note-details">
-                            <div class="note-name">DSA — Lecture Notes (Unit 1-3)</div>
-                            <div class="note-meta"><span>Prof. Sharma</span><span>2.4 MB</span><span>Aug 10, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="cs">
-                        <div class="note-icon ppt"><span class="material-symbols-outlined">slideshow</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Operating Systems — Process Scheduling Slides</div>
-                            <div class="note-meta"><span>Prof. Reddy</span><span>5.1 MB</span><span>Aug 8, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="cs">
-                        <div class="note-icon doc"><span class="material-symbols-outlined">article</span></div>
-                        <div class="note-details">
-                            <div class="note-name">DBMS — ER Diagrams Reference Sheet</div>
-                            <div class="note-meta"><span>Prof. Das</span><span>1.2 MB</span><span>Aug 7, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="mech">
-                        <div class="note-icon pdf"><span class="material-symbols-outlined">picture_as_pdf</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Thermodynamics — Laws & Cycles (Complete)</div>
-                            <div class="note-meta"><span>Prof. Patel</span><span>3.8 MB</span><span>Aug 9, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="mech">
-                        <div class="note-icon link"><span class="material-symbols-outlined">link</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Engineering Drawing — AutoCAD Tutorial Series</div>
-                            <div class="note-meta"><span>Prof. Kumar</span><span>External Link</span><span>Aug 5, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">open_in_new</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="eee">
-                        <div class="note-icon pdf"><span class="material-symbols-outlined">picture_as_pdf</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Power Systems — Load Flow Analysis Notes</div>
-                            <div class="note-meta"><span>Prof. Menon</span><span>4.2 MB</span><span>Aug 11, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="eee">
-                        <div class="note-icon doc"><span class="material-symbols-outlined">article</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Circuit Analysis — Lab Manual (Semester 5)</div>
-                            <div class="note-meta"><span>Prof. Iyer</span><span>1.8 MB</span><span>Aug 3, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="civil">
-                        <div class="note-icon pdf"><span class="material-symbols-outlined">picture_as_pdf</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Structural Mechanics — Bending Moment & Shear Force</div>
-                            <div class="note-meta"><span>Prof. Gupta</span><span>3.1 MB</span><span>Aug 12, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="civil">
-                        <div class="note-icon ppt"><span class="material-symbols-outlined">slideshow</span></div>
-                        <div class="note-details">
-                            <div class="note-name">Surveying — Total Station Operation Guide</div>
-                            <div class="note-meta"><span>Prof. Singh</span><span>6.3 MB</span><span>Aug 6, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="ece">
-                        <div class="note-icon pdf"><span class="material-symbols-outlined">picture_as_pdf</span></div>
-                        <div class="note-details">
-                            <div class="note-name">DSP — Z-Transform & Filter Design Notes</div>
-                            <div class="note-meta"><span>Prof. Nair</span><span>2.7 MB</span><span>Aug 13, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">download</span>
-                    </div>
-                    <div class="note-card" data-dept-filter="ece">
-                        <div class="note-icon link"><span class="material-symbols-outlined">link</span></div>
-                        <div class="note-details">
-                            <div class="note-name">VLSI — Cadence Virtuoso Lab Tutorials</div>
-                            <div class="note-meta"><span>Prof. Joshi</span><span>External Link</span><span>Aug 4, 2026</span></div>
-                        </div>
-                        <span class="note-action material-symbols-outlined">open_in_new</span>
-                    </div>
+                <div class="notes-list stagger" id="dynamicNotes">
+                    <!-- Dynamic notes will be loaded here -->
                 </div>
             </div>
         </div>
