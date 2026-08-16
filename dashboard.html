@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Campus Portal — Dashboard</title>
     <meta name="description" content="Campus Portal dashboard — View schedules, attendance, notes and announcements across all departments.">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#4a6cf7">
+    <link rel="apple-touch-icon" href="icon.svg">
+    <!-- Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'none'; frame-ancestors 'none';">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
@@ -44,6 +49,12 @@
                 Notes & Resources
             </div>
 
+            <div class="nav-section-title" id="nav-admin-title" style="display: none;">Admin</div>
+            <div class="nav-item" data-page="admin" id="nav-admin" style="display: none;">
+                <span class="material-symbols-outlined">admin_panel_settings</span>
+                Admin Console
+            </div>
+
             <div class="nav-section-title">Departments</div>
             <div class="nav-item" data-page="dept-cs" id="nav-dept-cs">
                 <span class="dept-dot cs"></span>
@@ -69,12 +80,15 @@
 
         <div class="sidebar-footer">
             <div class="user-card">
-                <div class="user-avatar">JS</div>
+                <div class="user-avatar" id="userAvatar">??</div>
                 <div class="user-info">
-                    <div class="user-name">John Student</div>
-                    <div class="user-dept">Computer Science</div>
+                    <div class="user-name" id="userName">Student</div>
+                    <div class="user-dept" id="userDept">Department</div>
                 </div>
-                <button class="icon-btn" title="Sign out" onclick="window.location.href='index.html'">
+                <button class="icon-btn" title="Change Password" id="changePasswordBtn">
+                    <span class="material-symbols-outlined">lock_reset</span>
+                </button>
+                <button class="icon-btn" title="Sign out" id="logoutBtn">
                     <span class="material-symbols-outlined">logout</span>
                 </button>
             </div>
@@ -95,7 +109,7 @@
                 <h2 class="page-title" id="pageTitle">Dashboard</h2>
             </div>
             <div class="top-bar-right">
-                <button class="icon-btn" id="notifBtn" title="Notifications">
+                <button class="icon-btn" id="notifBtn" title="Enable Push Notifications" onclick="window.enablePushNotifications()">
                     <span class="material-symbols-outlined">notifications</span>
                     <span class="badge"></span>
                 </button>
@@ -104,6 +118,33 @@
                 </button>
             </div>
         </header>
+
+        <!-- ═══ PAGE: ADMIN CONSOLE ═══ -->
+        <div class="page-panel" id="page-admin">
+            <div class="page-content">
+                <div class="section-header">
+                    <div>
+                        <div class="section-title">Admin Console</div>
+                        <div class="section-subtitle">Manage platform features and notifications</div>
+                    </div>
+                </div>
+
+                <div class="stats-grid stagger" style="margin-top: 24px;">
+                    <div class="stat-card" style="grid-column: span 12;">
+                        <h3>Broadcast Push Notification</h3>
+                        <p style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 16px;">Send a push notification to all subscribed client phones.</p>
+                        <form id="adminPushForm" onsubmit="event.preventDefault(); window.sendAdminPush();" style="display: flex; flex-direction: column; gap: 12px;">
+                            <input type="text" id="pushTitle" placeholder="Notification Title" style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;" required>
+                            <textarea id="pushBody" placeholder="Notification Message" rows="3" style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%; resize: vertical;" required></textarea>
+                            <button type="submit" class="login-btn" id="sendPushBtn" style="width: auto; align-self: flex-start; margin-top: 8px;">
+                                <span class="btn-text">Send Broadcast</span>
+                                <span class="btn-loader"></span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <!-- ═══ PAGE: DASHBOARD ═══ -->
         <div class="page-panel active" id="page-dashboard">
@@ -781,7 +822,7 @@
                 <div class="announcements-list stagger">
                     <div class="announcement-card">
                         <div class="ann-date">Aug 11, 2026</div>
-                        <div class="ann-title">Guest Lecture — 5G & Beyond</div>
+                        <div class="ann-title">Guest Lecture — 5G &amp; Beyond</div>
                         <div class="ann-body">Dr. Ramesh from IIT will deliver a guest lecture on next-gen communication technologies. Aug 18, Seminar Hall.</div>
                         <span class="ann-tag event">Event</span>
                     </div>
@@ -790,8 +831,435 @@
         </div>
 
     </main>
+
+    <!-- ═══ CHANGE PASSWORD MODAL (Dashboard) ═══ -->
+    <div class="cp-modal" id="dashChangePasswordModal">
+        <div class="cp-overlay" id="dashCpOverlay"></div>
+        <div class="cp-card">
+            <div class="cp-icon">
+                <span class="material-symbols-outlined">lock_reset</span>
+            </div>
+            <h2>Change Your Password</h2>
+            <p class="cp-subtitle">Enter your current password and choose a new one.</p>
+
+            <form id="dashCpForm" autocomplete="off">
+                <div class="form-group">
+                    <div class="input-wrapper" id="dashCpCurrentWrapper">
+                        <span class="material-symbols-outlined input-icon">key</span>
+                        <input
+                            type="password"
+                            id="dashCpCurrentPassword"
+                            placeholder="Current password"
+                            autocomplete="current-password"
+                            maxlength="32"
+                            required
+                        >
+                        <button type="button" class="toggle-password dash-cp-toggle-pw" title="Show password">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper" id="dashCpNewWrapper">
+                        <span class="material-symbols-outlined input-icon">lock</span>
+                        <input
+                            type="password"
+                            id="dashCpNewPassword"
+                            placeholder="New password"
+                            autocomplete="new-password"
+                            minlength="4"
+                            maxlength="32"
+                            required
+                        >
+                        <button type="button" class="toggle-password dash-cp-toggle-pw" title="Show password">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                    <!-- Password strength meter -->
+                    <div class="cp-strength">
+                        <div class="cp-strength-track">
+                            <div class="cp-strength-bar" id="dashCpStrengthBar"></div>
+                        </div>
+                        <span class="cp-strength-text" id="dashCpStrengthText"></span>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="input-wrapper" id="dashCpConfirmWrapper">
+                        <span class="material-symbols-outlined input-icon">lock_clock</span>
+                        <input
+                            type="password"
+                            id="dashCpConfirmPassword"
+                            placeholder="Confirm new password"
+                            autocomplete="new-password"
+                            minlength="4"
+                            maxlength="32"
+                            required
+                        >
+                        <button type="button" class="toggle-password dash-cp-toggle-pw" title="Show password">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="error-message" id="dashCpError">
+                    <span class="material-symbols-outlined">error</span>
+                    <span id="dashCpErrorText">Error</span>
+                </div>
+
+                <div class="success-message" id="dashCpSuccess">
+                    <span class="material-symbols-outlined">check_circle</span>
+                    <span id="dashCpSuccessText">Password changed successfully!</span>
+                </div>
+
+                <div class="cp-btn-row">
+                    <button type="button" class="cp-cancel-btn" id="dashCpCancelBtn">Cancel</button>
+                    <button type="submit" class="login-btn" id="dashCpSubmitBtn">
+                        <span class="btn-text">Change Password</span>
+                        <span class="btn-loader"></span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
 
+<script>
+  // ══════════════════════════════════════════════════════════
+  // SESSION GUARD — runs immediately, blocks non-logged-in users
+  // • Validates session integrity checksum
+  // • Checks session expiry
+  // • Auto-logout after 30 min of inactivity
+  // • Clears all traces on logout
+  // ══════════════════════════════════════════════════════════
+  (function() {
+    'use strict';
+
+    const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
+    const MIN_PASSWORD_LENGTH = 4;
+    const MAX_PASSWORD_LENGTH = 32;
+    const DEFAULT_PASSWORD_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+
+    // ── SHA-256 hashing ──
+    async function sha256(message) {
+      const msgBuffer = new TextEncoder().encode(message);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    // ── Custom password storage (localStorage, keyed per user) ──
+    function getStoredPasswordHash(username) {
+      try {
+        const store = JSON.parse(localStorage.getItem('campus_portal_passwords') || '{}');
+        return store[username] || null;
+      } catch (e) {
+        return null;
+      }
+    }
+
+    function setStoredPasswordHash(username, hash) {
+      try {
+        const store = JSON.parse(localStorage.getItem('campus_portal_passwords') || '{}');
+        store[username] = hash;
+        localStorage.setItem('campus_portal_passwords', JSON.stringify(store));
+      } catch (e) { /* ignore */ }
+    }
+
+    // ── Password strength checker ──
+    function checkPasswordStrength(password) {
+      let score = 0;
+      if (password.length >= 4) score++;
+      if (password.length >= 8) score++;
+      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+      if (/\d/.test(password)) score++;
+      if (/[^a-zA-Z0-9]/.test(password)) score++;
+
+      const levels = [
+        { label: 'Too short', color: '#ef4444', width: '5%' },
+        { label: 'Weak', color: '#ef4444', width: '20%' },
+        { label: 'Fair', color: '#f59e0b', width: '40%' },
+        { label: 'Good', color: '#f59e0b', width: '60%' },
+        { label: 'Strong', color: '#10b981', width: '80%' },
+        { label: 'Excellent', color: '#10b981', width: '100%' }
+      ];
+
+      return levels[Math.min(score, levels.length - 1)];
+    }
+
+    // ── Regenerate checksum to verify session wasn't tampered ──
+    function generateChecksum(s) {
+      const raw = s.id + '|' + s.name + '|' + s.dept + '|' + s.role + '|' + s.createdAt + '|' + s.expiresAt + '|campus_portal_v1';
+      var hash = 0;
+      for (var i = 0; i < raw.length; i++) {
+        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(36);
+    }
+
+    // ── Validate session ──
+    function validateSession(session) {
+      if (!session || typeof session !== 'object') return false;
+      if (!session.id || !session.name || !session.dept || !session.expiresAt) return false;
+      if (Date.now() > session.expiresAt) return false;
+      if (session.checksum !== generateChecksum(session)) return false;
+      return true;
+    }
+
+    // ── Secure logout ──
+    function secureLogout() {
+      sessionStorage.removeItem('campus_portal_user');
+      sessionStorage.removeItem('campus_portal_lockout');
+      window.location.href = 'index.html';
+    }
+
+    // ── Load & validate session ──
+    var raw = null;
+    try {
+      raw = sessionStorage.getItem('campus_portal_user');
+    } catch (e) {
+      secureLogout();
+      return;
+    }
+
+    if (!raw) {
+      window.location.href = 'index.html';
+      return;
+    }
+
+    var user;
+    try {
+      user = JSON.parse(raw);
+    } catch (e) {
+      secureLogout();
+      return;
+    }
+
+    if (!validateSession(user)) {
+      secureLogout();
+      return;
+    }
+
+    // ── Populate user info (textContent only — XSS safe) ──
+    document.getElementById('userAvatar').textContent = String(user.initials || '??').substring(0, 2);
+    document.getElementById('userName').textContent = String(user.name || 'Student').substring(0, 50);
+    document.getElementById('userDept').textContent = String(user.deptName || 'Department').substring(0, 50);
+
+    // ── Logout button ──
+    document.getElementById('logoutBtn').addEventListener('click', secureLogout);
+
+    // ══════════════════════════════════════════════════════════
+    // CHANGE PASSWORD (Dashboard)
+    // ══════════════════════════════════════════════════════════
+
+    const cpModal = document.getElementById('dashChangePasswordModal');
+    const cpOverlay = document.getElementById('dashCpOverlay');
+    const cpForm = document.getElementById('dashCpForm');
+    const cpCurrentPassword = document.getElementById('dashCpCurrentPassword');
+    const cpNewPassword = document.getElementById('dashCpNewPassword');
+    const cpConfirmPassword = document.getElementById('dashCpConfirmPassword');
+    const cpError = document.getElementById('dashCpError');
+    const cpErrorText = document.getElementById('dashCpErrorText');
+    const cpSuccess = document.getElementById('dashCpSuccess');
+    const cpSuccessText = document.getElementById('dashCpSuccessText');
+    const cpSubmitBtn = document.getElementById('dashCpSubmitBtn');
+    const cpCancelBtn = document.getElementById('dashCpCancelBtn');
+    const cpStrengthBar = document.getElementById('dashCpStrengthBar');
+    const cpStrengthText = document.getElementById('dashCpStrengthText');
+    const changePasswordBtn = document.getElementById('changePasswordBtn');
+
+    // Extract username from session user id (e.g., "CS001" → "cs001")
+    const currentUsername = String(user.id || '').toLowerCase();
+
+    function showCpModal() {
+      cpModal.classList.add('active');
+      cpCurrentPassword.value = '';
+      cpNewPassword.value = '';
+      cpConfirmPassword.value = '';
+      cpError.classList.remove('visible');
+      cpSuccess.classList.remove('visible');
+      cpStrengthBar.style.width = '0%';
+      cpStrengthText.textContent = '';
+      cpSubmitBtn.classList.remove('loading', 'success');
+      cpSubmitBtn.querySelector('.btn-text').textContent = 'Change Password';
+      setTimeout(function() { cpCurrentPassword.focus(); }, 300);
+    }
+
+    function hideCpModal() {
+      cpModal.classList.remove('active');
+    }
+
+    // Open modal
+    changePasswordBtn.addEventListener('click', showCpModal);
+
+    // Close modal
+    cpOverlay.addEventListener('click', hideCpModal);
+    cpCancelBtn.addEventListener('click', hideCpModal);
+
+    // Escape key closes modal
+    document.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape' && cpModal.classList.contains('active')) {
+        hideCpModal();
+      }
+    });
+
+    // Password strength live indicator
+    cpNewPassword.addEventListener('input', function() {
+      var pw = cpNewPassword.value;
+      if (pw.length === 0) {
+        cpStrengthBar.style.width = '0%';
+        cpStrengthText.textContent = '';
+        return;
+      }
+      var strength = checkPasswordStrength(pw);
+      cpStrengthBar.style.width = strength.width;
+      cpStrengthBar.style.background = strength.color;
+      cpStrengthText.textContent = strength.label;
+      cpStrengthText.style.color = strength.color;
+    });
+
+    // Toggle password visibility in modal
+    document.querySelectorAll('.dash-cp-toggle-pw').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        var input = btn.previousElementSibling;
+        var isPassword = input.type === 'password';
+        input.type = isPassword ? 'text' : 'password';
+        btn.querySelector('.material-symbols-outlined').textContent =
+          isPassword ? 'visibility_off' : 'visibility';
+      });
+    });
+
+    // Clear errors on input
+    [cpCurrentPassword, cpNewPassword, cpConfirmPassword].forEach(function(input) {
+      input.addEventListener('input', function() {
+        cpError.classList.remove('visible');
+        cpSuccess.classList.remove('visible');
+      });
+    });
+
+    // Form submit
+    cpForm.addEventListener('submit', async function(e) {
+      e.preventDefault();
+
+      var currentPw = cpCurrentPassword.value;
+      var newPw = cpNewPassword.value;
+      var confirmPw = cpConfirmPassword.value;
+
+      // Validate current password
+      if (!currentPw) {
+        cpErrorText.textContent = 'Please enter your current password.';
+        cpError.classList.add('visible');
+        return;
+      }
+
+      // Validate new password length
+      if (newPw.length < MIN_PASSWORD_LENGTH) {
+        cpErrorText.textContent = 'New password must be at least ' + MIN_PASSWORD_LENGTH + ' characters.';
+        cpError.classList.add('visible');
+        return;
+      }
+
+      if (newPw.length > MAX_PASSWORD_LENGTH) {
+        cpErrorText.textContent = 'New password must be at most ' + MAX_PASSWORD_LENGTH + ' characters.';
+        cpError.classList.add('visible');
+        return;
+      }
+
+      // Confirm match
+      if (newPw !== confirmPw) {
+        cpErrorText.textContent = 'New passwords do not match.';
+        cpError.classList.add('visible');
+        return;
+      }
+
+      cpSubmitBtn.classList.add('loading');
+
+      // Hash passwords
+      var currentHash, newHash;
+      try {
+        currentHash = await sha256(currentPw);
+        newHash = await sha256(newPw);
+      } catch (err) {
+        cpErrorText.textContent = 'Hashing error. Please try again.';
+        cpError.classList.add('visible');
+        cpSubmitBtn.classList.remove('loading');
+        return;
+      }
+
+      // Verify current password
+      var storedHash = getStoredPasswordHash(currentUsername);
+      var expectedHash = storedHash || DEFAULT_PASSWORD_HASH;
+
+      if (currentHash !== expectedHash) {
+        cpErrorText.textContent = 'Current password is incorrect.';
+        cpError.classList.add('visible');
+        cpSubmitBtn.classList.remove('loading');
+        return;
+      }
+
+      // Check new password isn't same as current
+      if (newHash === currentHash) {
+        cpErrorText.textContent = 'New password must be different from your current password.';
+        cpError.classList.add('visible');
+        cpSubmitBtn.classList.remove('loading');
+        return;
+      }
+
+      // Check not reverting to default
+      if (newHash === DEFAULT_PASSWORD_HASH) {
+        cpErrorText.textContent = 'Please choose a different password than the default.';
+        cpError.classList.add('visible');
+        cpSubmitBtn.classList.remove('loading');
+        return;
+      }
+
+      // Save new password
+      setStoredPasswordHash(currentUsername, newHash);
+
+      // Show success
+      cpSubmitBtn.classList.remove('loading');
+      cpSubmitBtn.classList.add('success');
+      cpSubmitBtn.querySelector('.btn-text').textContent = 'Password Changed!';
+      cpError.classList.remove('visible');
+      cpSuccess.classList.add('visible');
+
+      // Close modal after a short delay
+      setTimeout(function() {
+        hideCpModal();
+      }, 1500);
+    });
+
+    // ── Auto-logout on inactivity ──
+    var inactivityTimer;
+    function resetInactivityTimer() {
+      clearTimeout(inactivityTimer);
+      inactivityTimer = setTimeout(function() {
+        alert('Session expired due to inactivity. You will be logged out.');
+        secureLogout();
+      }, SESSION_TIMEOUT_MS);
+    }
+
+    ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart'].forEach(function(evt) {
+      document.addEventListener(evt, resetInactivityTimer, { passive: true });
+    });
+    resetInactivityTimer();
+
+    // ── Log out when tab/window is closed ──
+    window.addEventListener('beforeunload', function() {
+      // Session is in sessionStorage so it auto-clears on browser close,
+      // but we also update the expiry timestamp
+      try {
+        user.expiresAt = Date.now() + SESSION_TIMEOUT_MS;
+        user.checksum = generateChecksum(user);
+        sessionStorage.setItem('campus_portal_user', JSON.stringify(user));
+      } catch(e) { /* ignore */ }
+    });
+
+  })();
+</script>
 <script src="js/app.js"></script>
+<script src="js/push.js"></script>
 </body>
 </html>

@@ -24,7 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
     'dept-mech': 'Mechanical Engg.',
     'dept-eee': 'Electrical Engg.',
     'dept-civil': 'Civil Engg.',
-    'dept-ece': 'Electronics & Comm.'
+    'dept-ece': 'Electronics & Comm.',
+    'admin': 'Admin Console'
   };
 
   // ── Navigation ──
@@ -198,6 +199,20 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Initialize ──
+  // Check role to show Admin UI
+  try {
+    const sessionRaw = sessionStorage.getItem('campus_portal_user');
+    if (sessionRaw) {
+      const session = JSON.parse(sessionRaw);
+      if (session.role === 'admin') {
+        const titleEl = document.getElementById('nav-admin-title');
+        const itemEl = document.getElementById('nav-admin');
+        if (titleEl) titleEl.style.display = 'block';
+        if (itemEl) itemEl.style.display = 'flex';
+      }
+    }
+  } catch (e) { /* ignore */ }
+
   // Animate attendance bars on initial load if attendance is visible
   animateAttendanceBars();
 
