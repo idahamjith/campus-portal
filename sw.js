@@ -1,11 +1,10 @@
-// Campus Portal — Service Worker (Firebase Cloud Messaging) v2
-// Handles background push notifications via FCM.
+// Campus Portal — Service Worker v3
+// Uses raw push event handler for reliable notification display.
 
-// Import Firebase Messaging compat SDK (required for SW context)
+// Firebase SDK is still needed so getToken() works on the client side.
 importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js');
 importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
 
-// Initialize Firebase inside the service worker
 firebase.initializeApp({
   apiKey: "AIzaSyB9aFyb013SR9YC7EGsY5jhBAWcnhiyaGc",
   authDomain: "campus-portal-6d8f4.firebaseapp.com",
@@ -15,40 +14,59 @@ firebase.initializeApp({
   appId: "1:936704518333:web:add97c6dac0aaa16846fd4"
 });
 
-const messaging = firebase.messaging();
+// Keep this so Firebase SDK doesn't complain
+firebase.messaging();
 
 // ── Service Worker lifecycle ──
 self.addEventListener('install', () => {
-  console.log('[SW] Installed v2');
+  console.log('[SW v3] Installed');
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activated v2');
+  console.log('[SW v3] Activated');
   event.waitUntil(self.clients.claim());
 });
 
-// ── Handle FCM background messages ──
-// This fires when a push arrives while the app is in the background or closed.
-messaging.onBackgroundMessage((payload) => {
-  console.log('[SW] Background message received (data payload):', payload);
-  
-  const title = payload.data?.title || 'Campus Portal';
+// ── Raw push event handler ──
+// This intercepts the push BEFORE Firebase can show a generic fallback.
+// The key: showNotification MUST be inside event.waitUntil().
+self.addEventListener('push', (event) => {
+  console.log('[SW v3] Push event received:', event);
+
+  let data = {};
+  try {
+    const raw = event.data?.json();
+    // FCM wraps data-only messages under raw.data
+    data = raw?.data || raw?.notification || raw || {};
+  } catch (e) {
+    try {
+      data = { body: event.data?.text() || '' };
+    } catch (e2) {
+      data = {};
+    }
+  }
+
+  const title = data.title || 'Campus Portal';
   const options = {
-    body: payload.data?.body || 'New update available.',
+    body: data.body || 'New update available.',
     icon: './icon.svg',
     badge: './icon.svg',
+    tag: 'campus-portal-' + Date.now(),
     data: {
-      url: payload.data?.url || './dashboard.html'
+      url: data.url || './dashboard.html'
     }
   };
 
-  self.registration.showNotification(title, options);
+  // CRITICAL: This must be inside event.waitUntil() or Chrome shows fallback
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
 });
 
 // ── Handle notification click ──
 self.addEventListener('notificationclick', (event) => {
-  console.log('[SW] Notification clicked');
+  console.log('[SW v3] Notification clicked');
   event.notification.close();
 
   const targetUrl = event.notification.data?.url || './dashboard.html';
