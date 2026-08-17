@@ -75,6 +75,18 @@ async function sendFcmMessage(projectId, accessToken, token, title, body) {
       notification: {
         title: title,
         body: body
+      },
+      webpush: {
+        notification: {
+          icon: '/icon.svg'
+        },
+        fcm_options: {
+          link: '/dashboard.html'
+        }
+      },
+      data: {
+        title: title,
+        body: body
       }
     }
   };

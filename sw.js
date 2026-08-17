@@ -32,18 +32,9 @@ self.addEventListener('activate', (event) => {
 // This fires when a push arrives while the app is in the background or closed.
 messaging.onBackgroundMessage((payload) => {
   console.log('[SW] Background message received:', payload);
-
-  const title   = payload.notification?.title || 'Campus Portal Update';
-  const options = {
-    body:  payload.notification?.body  || 'You have a new notification.',
-    icon:  payload.notification?.icon  || './icon.svg',
-    badge: './icon.svg',
-    data: {
-      url: payload.data?.url || './dashboard.html'
-    }
-  };
-
-  self.registration.showNotification(title, options);
+  // Do NOT call self.registration.showNotification() manually if the payload contains
+  // a 'notification' object, because the Firebase Messaging SDK automatically 
+  // displays a notification for it. Doing so will result in duplicate or blank notifications.
 });
 
 // ── Handle notification click ──
