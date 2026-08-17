@@ -117,16 +117,28 @@ window.sendAdminPush = async function() {
     return;
   }
 
-  // Show instructions for sending via Firebase Console
-  alert(
-    `To send a broadcast notification:\n\n` +
-    `1. Go to Firebase Console (console.firebase.google.com)\n` +
-    `2. Select your project → Engage → Messaging\n` +
-    `3. Create a new campaign with:\n   Title: "${title}"\n   Body: "${body}"\n` +
-    `4. Target: All users (or by topic)\n` +
-    `5. Send now\n\n` +
-    `This is free and unlimited on the Firebase Spark plan.`
-  );
+  btn.classList.add('loading');
+  try {
+    const response = await fetch('http://localhost:3000/api/sendPush', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ title, body })
+    });
+    
+    if (response.ok) {
+      alert('Broadcast notification sent successfully!');
+      document.getElementById('pushTitle').value = '';
+      document.getElementById('pushBody').value = '';
+    } else {
+      const errorData = await response.json();
+      alert(`Error sending notification: ${errorData.error}`);
+    }
+  } catch (error) {
+    console.error('Error sending push notification:', error);
+    alert('Failed to connect to the push server. Make sure it is running.');
+  } finally {
+    btn.classList.remove('loading');
+  }
 };
 
 // ── Initialize on load ──
