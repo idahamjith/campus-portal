@@ -21,7 +21,7 @@ async function registerServiceWorker() {
     return null;
   }
   try {
-    const reg = await navigator.serviceWorker.register('./sw.js');
+    const reg = await navigator.serviceWorker.register('./sw.js?v=3');
     console.log('[FCM] Service Worker registered, scope:', reg.scope);
     return reg;
   } catch (err) {
