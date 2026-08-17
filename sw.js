@@ -1,21 +1,6 @@
-// Campus Portal — Service Worker v3
+// Campus Portal — Service Worker v6
 // Uses raw push event handler for reliable notification display.
-
-// Firebase SDK is still needed so getToken() works on the client side.
-importScripts('./js/firebase-app-compat.js');
-importScripts('./js/firebase-messaging-compat.js');
-
-firebase.initializeApp({
-  apiKey: "AIzaSyB9aFyb013SR9YC7EGsY5jhBAWcnhiyaGc",
-  authDomain: "campus-portal-6d8f4.firebaseapp.com",
-  projectId: "campus-portal-6d8f4",
-  storageBucket: "campus-portal-6d8f4.firebasestorage.app",
-  messagingSenderId: "936704518333",
-  appId: "1:936704518333:web:add97c6dac0aaa16846fd4"
-});
-
-// Keep this so Firebase SDK doesn't complain
-firebase.messaging();
+// Completely standalone - no buggy Firebase SDKs required!
 
 // ── Service Worker lifecycle ──
 self.addEventListener('install', () => {
