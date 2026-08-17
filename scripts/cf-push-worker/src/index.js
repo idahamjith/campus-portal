@@ -72,21 +72,10 @@ async function sendFcmMessage(projectId, accessToken, token, title, body) {
   const payload = {
     message: {
       token: token,
-      notification: {
-        title: title,
-        body: body
-      },
-      webpush: {
-        notification: {
-          icon: '/icon.svg'
-        },
-        fcm_options: {
-          link: '/dashboard.html'
-        }
-      },
       data: {
         title: title,
-        body: body
+        body: body,
+        url: './dashboard.html'
       }
     }
   };

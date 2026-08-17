@@ -1,4 +1,4 @@
-// Campus Portal — Service Worker (Firebase Cloud Messaging)
+// Campus Portal — Service Worker (Firebase Cloud Messaging) v2
 // Handles background push notifications via FCM.
 
 // Import Firebase Messaging compat SDK (required for SW context)
@@ -19,22 +19,31 @@ const messaging = firebase.messaging();
 
 // ── Service Worker lifecycle ──
 self.addEventListener('install', () => {
-  console.log('[SW] Installed');
+  console.log('[SW] Installed v2');
   self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-  console.log('[SW] Activated');
+  console.log('[SW] Activated v2');
   event.waitUntil(self.clients.claim());
 });
 
 // ── Handle FCM background messages ──
 // This fires when a push arrives while the app is in the background or closed.
 messaging.onBackgroundMessage((payload) => {
-  console.log('[SW] Background message received:', payload);
-  // Do NOT call self.registration.showNotification() manually if the payload contains
-  // a 'notification' object, because the Firebase Messaging SDK automatically 
-  // displays a notification for it. Doing so will result in duplicate or blank notifications.
+  console.log('[SW] Background message received (data payload):', payload);
+  
+  const title = payload.data?.title || 'Campus Portal';
+  const options = {
+    body: payload.data?.body || 'New update available.',
+    icon: './icon.svg',
+    badge: './icon.svg',
+    data: {
+      url: payload.data?.url || './dashboard.html'
+    }
+  };
+
+  self.registration.showNotification(title, options);
 });
 
 // ── Handle notification click ──
