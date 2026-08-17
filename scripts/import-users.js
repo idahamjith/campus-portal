@@ -17,10 +17,10 @@
  *   Firebase Console → Project Settings → Service Accounts → Generate new private key
  */
 
-const admin = require('firebase-admin');
-const path  = require('path');
+const { initializeApp, cert } = require('firebase-admin/app');
+const { getAuth }             = require('firebase-admin/auth');
+const { getFirestore, FieldValue } = require('firebase-admin/firestore');
 
-// ── Initialize Admin SDK ──
 let serviceAccount;
 try {
   serviceAccount = require('./serviceAccountKey.json');
@@ -30,12 +30,14 @@ try {
   process.exit(1);
 }
 
-admin.initializeApp({
-  credential: admin.credential.cert(serviceAccount)
+// ── Initialize Admin SDK ──
+initializeApp({
+  credential: cert(serviceAccount)
 });
 
-const auth = admin.auth();
-const db   = admin.firestore();
+const auth = getAuth();
+const db   = getFirestore();
+
 
 // ── Student data — mirrors auth.js original structure ──
 const DEFAULT_PASSWORD = 'Campus@1234';
@@ -100,7 +102,7 @@ async function importUser(userData) {
       deptName:          userData.deptName,
       role:              userData.role,
       mustChangePassword: true,   // Force password change on first login
-      createdAt:         admin.firestore.FieldValue.serverTimestamp()
+      createdAt:         FieldValue.serverTimestamp()
     }, { merge: true });
 
     return { success: true, email };
