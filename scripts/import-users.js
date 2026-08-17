@@ -20,6 +20,8 @@
 const { initializeApp, cert } = require('firebase-admin/app');
 const { getAuth }             = require('firebase-admin/auth');
 const { getFirestore, FieldValue } = require('firebase-admin/firestore');
+const fs = require('fs');
+const path = require('path');
 
 let serviceAccount;
 try {
@@ -40,30 +42,41 @@ const db   = getFirestore();
 
 
 // ── Student data — mirrors auth.js original structure ──
-const DEFAULT_PASSWORD = 'Campus@1234';
+const DEFAULT_PASSWORD = '123456';
 
-function generateDeptStudents(prefix, deptId, deptName, count) {
-  return Array.from({ length: count }, (_, i) => {
-    const num = String(i + 1).padStart(3, '0');
-    return {
-      id:       `${prefix}${num}`,
-      username: `${prefix.toLowerCase()}${num}`,
-      name:     `Student ${prefix}${num}`,
-      dept:     deptId,
-      deptName: deptName,
-      role:     'student'
-    };
-  });
-}
+const DEPT_MAP = {
+  'Computer':   { id: 'cs',    name: 'Computer Science' },
+  'Mechanical': { id: 'mech',  name: 'Mechanical Engineering' },
+  'Electrical': { id: 'eee',   name: 'Electrical Engineering' },
+  'Civil':      { id: 'civil', name: 'Civil Engineering' },
+  'Mena':       { id: 'mena',  name: 'Mechatronics / Mena' }
+};
 
 const USERS = [
-  { id: 'ADMIN001', username: 'admin', name: 'System Administrator', dept: 'admin', deptName: 'Administration', role: 'admin' },
-  ...generateDeptStudents('CS',  'cs',    'Computer Science',       120),
-  ...generateDeptStudents('ME',  'mech',  'Mechanical Engineering', 110),
-  ...generateDeptStudents('EE',  'eee',   'Electrical Engineering', 105),
-  ...generateDeptStudents('CE',  'civil', 'Civil Engineering',      100),
-  ...generateDeptStudents('EC',  'ece',   'Electronics & Comm.',    110)
+  { id: 'ADMIN001', username: 'admin', name: 'System Administrator', dept: 'admin', deptName: 'Administration', role: 'admin' }
 ];
+
+const csvPath = path.join(__dirname, 'students.csv');
+const csvData = fs.readFileSync(csvPath, 'utf8');
+
+const lines = csvData.split('\n');
+for (const line of lines) {
+  if (!line.trim()) continue;
+  const [indexStr, deptStr] = line.trim().split(',');
+  if (!indexStr || !deptStr) continue;
+
+  const username = indexStr.slice(-4);
+  const deptInfo = DEPT_MAP[deptStr] || { id: 'unknown', name: deptStr };
+
+  USERS.push({
+    id: indexStr,
+    username: username,
+    name: `Student ${indexStr}`,
+    dept: deptInfo.id,
+    deptName: deptInfo.name,
+    role: 'student'
+  });
+}
 
 // ── Helper: username → Firebase email ──
 function toEmail(username) {
@@ -85,9 +98,10 @@ async function importUser(userData) {
       });
     } catch (authErr) {
       if (authErr.code === 'auth/email-already-exists') {
-        // Already exists — fetch it
+        // Already exists — update the password
         userRecord = await auth.getUserByEmail(email);
-        console.log(`  ⚠  Already exists: ${email}`);
+        await auth.updateUser(userRecord.uid, { password: DEFAULT_PASSWORD });
+        console.log(`  ⚠  Updated existing user: ${email}`);
       } else {
         throw authErr;
       }

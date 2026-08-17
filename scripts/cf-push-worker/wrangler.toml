@@ -1,0 +1,8 @@
+name = "cf-push-worker"
+main = "src/index.js"
+compatibility_date = "2023-12-01"
+
+# The following secrets must be set via wrangler:
+# npx wrangler secret put FIREBASE_PROJECT_ID
+# npx wrangler secret put FIREBASE_CLIENT_EMAIL
+# npx wrangler secret put FIREBASE_PRIVATE_KEY

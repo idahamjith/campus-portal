@@ -80,6 +80,79 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // ── Mobile Bottom Nav ──
+  const mobileNavBtns = document.querySelectorAll('.mobile-bottom-nav .nav-btn[data-target]');
+  mobileNavBtns.forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Update active state
+      document.querySelectorAll('.mobile-bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      
+      // Handle page navigation
+      let target = btn.dataset.target;
+      if (target === 'department') {
+        const userProfile = JSON.parse(localStorage.getItem('campus_portal_profile') || '{}');
+        target = userProfile.dept ? `dept-${userProfile.dept}` : 'dashboard';
+      }
+      
+      navigateTo(target);
+    });
+  });
+
+  // ── Mobile Profile Modal ──
+  const mobileProfileBtn = document.getElementById('mobileProfileBtn');
+  const mobileProfileModal = document.getElementById('mobileProfileModal');
+  const mobileProfileOverlay = document.getElementById('mobileProfileOverlay');
+  const mobileLogoutBtn = document.getElementById('mobileLogoutBtn');
+  const mobileChangePwBtn = document.getElementById('mobileChangePwBtn');
+  const mobileAvatar = document.getElementById('mobileAvatar');
+  const mobileUserName = document.getElementById('mobileUserName');
+  const mobileUserDept = document.getElementById('mobileUserDept');
+
+  if (mobileProfileBtn && mobileProfileModal) {
+    mobileProfileBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      
+      // Sync active state visually
+      document.querySelectorAll('.mobile-bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+      mobileProfileBtn.classList.add('active');
+
+      // Populate user info from DOM (populated in auth onAuthStateChanged)
+      mobileAvatar.textContent = document.getElementById('userAvatar')?.textContent || '??';
+      mobileAvatar.className = document.getElementById('userAvatar')?.className || 'user-avatar';
+      mobileUserName.textContent = document.getElementById('userName')?.textContent || 'Student';
+      mobileUserDept.textContent = document.getElementById('userDept')?.textContent || 'Department';
+
+      mobileProfileModal.classList.add('active');
+    });
+
+    mobileProfileOverlay.addEventListener('click', () => {
+      mobileProfileModal.classList.remove('active');
+      // Reset active state to current page if closed
+      document.querySelectorAll('.mobile-bottom-nav .nav-btn').forEach(b => b.classList.remove('active'));
+      const activeDesktopNav = document.querySelector('.nav-item.active');
+      if (activeDesktopNav) {
+        let activePage = activeDesktopNav.dataset.page;
+        if (activePage.startsWith('dept-')) activePage = 'department';
+        const correspondingMobileNav = document.querySelector(`.mobile-bottom-nav .nav-btn[data-target="${activePage}"]`);
+        if (correspondingMobileNav) correspondingMobileNav.classList.add('active');
+      } else {
+        document.querySelector('.mobile-bottom-nav .nav-btn[data-target="dashboard"]').classList.add('active');
+      }
+    });
+
+    mobileLogoutBtn.addEventListener('click', () => {
+      document.getElementById('logoutBtn')?.click();
+    });
+
+    mobileChangePwBtn.addEventListener('click', () => {
+      mobileProfileModal.classList.remove('active');
+      document.getElementById('changePasswordBtn')?.click();
+    });
+  }
+
   // ── Sidebar Toggle (Mobile) ──
   function openSidebar() {
     sidebar.classList.add('open');

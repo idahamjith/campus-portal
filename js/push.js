@@ -12,7 +12,7 @@ import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/f
 
 // Your VAPID public key from Firebase Console → Project Settings → Cloud Messaging
 // Replace this with YOUR key from: Firebase Console → Project Settings → Cloud Messaging → Web Push certificates
-const VAPID_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLj8eLlsnCpo';
+const VAPID_KEY = 'BFCcr2O1Rb8KO4_up5JO4-beWwRrpSv2ZYOD5k066qixlNAI4u4ksD8enJ4Mmati8YXcvBslYWTRbFDwkfFFV7Y';
 
 // ── Register service worker ──
 async function registerServiceWorker() {
@@ -78,7 +78,7 @@ function setupForegroundMessages() {
 }
 
 // ── Request notification permission and subscribe ──
-window.enablePushNotifications = async function() {
+window.enablePushNotifications = async function () {
   if (!('Notification' in window)) {
     alert('Push notifications are not supported in this browser.');
     return;
@@ -107,10 +107,10 @@ window.enablePushNotifications = async function() {
 // Firebase Console → Engage → Messaging → New Campaign
 //
 // The button below is kept for UI completeness but shows instructions.
-window.sendAdminPush = async function() {
+window.sendAdminPush = async function () {
   const title = document.getElementById('pushTitle')?.value?.trim();
-  const body  = document.getElementById('pushBody')?.value?.trim();
-  const btn   = document.getElementById('sendPushBtn');
+  const body = document.getElementById('pushBody')?.value?.trim();
+  const btn = document.getElementById('sendPushBtn');
 
   if (!title || !body) {
     alert('Please enter a title and message.');
@@ -119,12 +119,12 @@ window.sendAdminPush = async function() {
 
   btn.classList.add('loading');
   try {
-    const response = await fetch('http://localhost:3000/api/sendPush', {
+    const response = await fetch('https://cf-push-worker.induwaradahamjith2004.workers.dev/api/sendPush', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ title, body })
     });
-    
+
     if (response.ok) {
       alert('Broadcast notification sent successfully!');
       document.getElementById('pushTitle').value = '';

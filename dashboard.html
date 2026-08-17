@@ -9,7 +9,7 @@
     <meta name="theme-color" content="#4a6cf7">
     <link rel="apple-touch-icon" href="icon.svg">
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' http://localhost:* https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' https://cf-push-worker.induwaradahamjith2004.workers.dev https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-ancestors 'none';">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
@@ -80,6 +80,10 @@
                 <span class="dept-dot ece"></span>
                 Electronics & Comm.
             </div>
+            <div class="nav-item" data-page="dept-mena" id="nav-dept-mena">
+                <span class="dept-dot mena"></span>
+                Mena
+            </div>
         </nav>
 
         <div class="sidebar-footer">
@@ -99,10 +103,30 @@
         </div>
     </aside>
 
+    <!-- â• â• â•  MOBILE BOTTOM NAV â• â• â•  -->
+    <nav class="mobile-bottom-nav">
+        <a href="#" class="nav-btn active" data-target="dashboard">
+            <span class="material-symbols-outlined">dashboard</span>
+            <span>Home</span>
+        </a>
+        <a href="#" class="nav-btn" data-target="department">
+            <span class="material-symbols-outlined">domain</span>
+            <span>Dept</span>
+        </a>
+        <a href="#" class="nav-btn" data-target="videos">
+            <span class="material-symbols-outlined">video_library</span>
+            <span>Videos</span>
+        </a>
+        <a href="#" class="nav-btn" id="mobileProfileBtn">
+            <span class="material-symbols-outlined">person</span>
+            <span>Profile</span>
+        </a>
+    </nav>
+
     <!-- Sidebar overlay (mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- â•â•â• MAIN CONTENT â•â•â• -->
+    <!-- â• â• â•  MAIN CONTENT â• â• â•  -->
     <main class="main-content">
         <!-- Top Bar -->
         <header class="top-bar">
@@ -315,6 +339,7 @@
                     <button class="dept-tab" data-dept="eee">Electrical</button>
                     <button class="dept-tab" data-dept="civil">Civil</button>
                     <button class="dept-tab" data-dept="ece">Electronics</button>
+                    <button class="dept-tab" data-dept="mena">Mena</button>
                 </div>
 
                 <div class="timetable-grid stagger">
@@ -453,6 +478,7 @@
                     <button class="dept-tab" data-dept="eee">Electrical</button>
                     <button class="dept-tab" data-dept="civil">Civil</button>
                     <button class="dept-tab" data-dept="ece">Electronics</button>
+                    <button class="dept-tab" data-dept="mena">Mena</button>
                 </div>
 
                 <div class="attendance-grid stagger">
@@ -558,6 +584,7 @@
                     <button class="dept-tab" data-dept="eee">Electrical</button>
                     <button class="dept-tab" data-dept="civil">Civil</button>
                     <button class="dept-tab" data-dept="ece">Electronics</button>
+                    <button class="dept-tab" data-dept="mena">Mena</button>
                 </div>
 
                 <div class="notes-list stagger" id="dynamicNotes">
@@ -946,6 +973,36 @@
       const itemEl  = document.getElementById('nav-admin');
       if (titleEl) titleEl.style.display = 'block';
       if (itemEl)  itemEl.style.display  = 'flex';
+    } else if (profile.dept) {
+      // 1. Hide irrelevant sidebar department links
+      const allDepts = ['cs', 'mech', 'eee', 'civil', 'ece', 'mena'];
+      allDepts.forEach(d => {
+        if (d !== profile.dept) {
+          const navItem = document.getElementById(`nav-dept-${d}`);
+          if (navItem) navItem.style.display = 'none';
+        }
+      });
+
+      // 2. Update Quick Action Button dynamically
+      const qaBtn = document.querySelector('.quick-actions .quick-action-btn[data-navigate^="dept-"]');
+      if (qaBtn) {
+        qaBtn.dataset.navigate = `dept-${profile.dept}`;
+        qaBtn.innerHTML = `<span class="material-symbols-outlined">school</span> ${String(profile.deptName).split(' ')[0]} Dept`;
+      }
+
+      // 3. Filter tabs and auto-select
+      const allTabs = document.querySelectorAll('.dept-tab');
+      allTabs.forEach(tab => {
+        if (tab.dataset.dept !== profile.dept) {
+          tab.style.display = 'none';
+        }
+      });
+
+      // Automatically click the user's department tab in all tab containers
+      // We use a slight delay to ensure app.js has initialized the event listeners
+      setTimeout(() => {
+        document.querySelectorAll(`.dept-tab[data-dept="${profile.dept}"]`).forEach(tab => tab.click());
+      }, 50);
     }
 
     // Logout button
@@ -1077,6 +1134,25 @@
     });
   });
 </script>
+
+    <!-- â• â• â•  MOBILE PROFILE MODAL â• â• â•  -->
+    <div class="cp-modal" id="mobileProfileModal">
+        <div class="cp-overlay" id="mobileProfileOverlay"></div>
+        <div class="cp-card" style="padding: 30px 20px;">
+            <div class="user-avatar" id="mobileAvatar" style="margin: 0 auto 15px; width: 64px; height: 64px; font-size: 24px;">??</div>
+            <h2 id="mobileUserName" style="font-size: 1.3rem; margin-bottom: 5px;">Student</h2>
+            <p id="mobileUserDept" style="color: var(--text-secondary); margin-bottom: 25px;">Department</p>
+            
+            <button class="login-btn" id="mobileChangePwBtn" style="margin-bottom: 12px; background: rgba(255,255,255,0.05); color: white;">
+                <span class="material-symbols-outlined">lock_reset</span>
+                <span class="btn-text">Change Password</span>
+            </button>
+            <button class="login-btn" id="mobileLogoutBtn" style="background: rgba(239, 68, 68, 0.15); color: #f87171;">
+                <span class="material-symbols-outlined">logout</span>
+                <span class="btn-text">Sign Out</span>
+            </button>
+        </div>
+    </div>
 
 <script type="module" src="js/app.js"></script>
 <script type="module" src="js/push.js"></script>

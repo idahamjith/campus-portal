@@ -91,7 +91,8 @@ onAuthStateChanged(auth, async (user) => {
   if (user) {
     try {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists() && userDoc.data().mustChangePassword) {
+      // Temporarily disabled for testing
+      if (userDoc.exists() && false /* userDoc.data().mustChangePassword */) {
         // First-time login: show modal on top of form
         loadingOverlay.remove();
         pendingFirebaseUser = user;
@@ -335,7 +336,8 @@ form.addEventListener('submit', async (e) => {
     // Check first-time login flag
     try {
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if (userDoc.exists() && userDoc.data().mustChangePassword) {
+      // Temporarily disabled for testing
+      if (userDoc.exists() && false /* userDoc.data().mustChangePassword */) {
         pendingFirebaseUser = user;
         loginBtn.classList.remove('loading');
         showChangePasswordModal();
