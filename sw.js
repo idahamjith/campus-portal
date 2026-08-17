@@ -2,8 +2,8 @@
 // Uses raw push event handler for reliable notification display.
 
 // Firebase SDK is still needed so getToken() works on the client side.
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js');
-importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
+importScripts('./js/firebase-app-compat.js');
+importScripts('./js/firebase-messaging-compat.js');
 
 firebase.initializeApp({
   apiKey: "AIzaSyB9aFyb013SR9YC7EGsY5jhBAWcnhiyaGc",
