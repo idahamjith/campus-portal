@@ -1,62 +1,68 @@
-// Service Worker for Campus Portal Push Notifications
+// Campus Portal — Service Worker (Firebase Cloud Messaging)
+// Handles background push notifications via FCM.
 
-self.addEventListener('install', (event) => {
-    console.log('[Service Worker] Installed');
-    self.skipWaiting();
+// Import Firebase Messaging compat SDK (required for SW context)
+importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-app-compat.js');
+importScripts('https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging-compat.js');
+
+// Initialize Firebase inside the service worker
+firebase.initializeApp({
+  apiKey: "AIzaSyB9aFyb013SR9YC7EGsY5jhBAWcnhiyaGc",
+  authDomain: "campus-portal-6d8f4.firebaseapp.com",
+  projectId: "campus-portal-6d8f4",
+  storageBucket: "campus-portal-6d8f4.firebasestorage.app",
+  messagingSenderId: "936704518333",
+  appId: "1:936704518333:web:add97c6dac0aaa16846fd4"
+});
+
+const messaging = firebase.messaging();
+
+// ── Service Worker lifecycle ──
+self.addEventListener('install', () => {
+  console.log('[SW] Installed');
+  self.skipWaiting();
 });
 
 self.addEventListener('activate', (event) => {
-    console.log('[Service Worker] Activated');
-    event.waitUntil(self.clients.claim());
+  console.log('[SW] Activated');
+  event.waitUntil(self.clients.claim());
 });
 
-self.addEventListener('push', (event) => {
-    console.log('[Service Worker] Push Received.');
-    
-    let title = 'Campus Portal Update';
-    let options = {
-        body: 'You have a new notification.',
-        icon: 'icon.svg',
-        badge: 'icon.svg',
-        data: {
-            url: './dashboard.html'
-        }
-    };
+// ── Handle FCM background messages ──
+// This fires when a push arrives while the app is in the background or closed.
+messaging.onBackgroundMessage((payload) => {
+  console.log('[SW] Background message received:', payload);
 
-    if (event.data) {
-        try {
-            const data = event.data.json();
-            title = data.title || title;
-            options.body = data.body || options.body;
-            options.icon = data.icon || options.icon;
-            options.data.url = data.url || options.data.url;
-        } catch (e) {
-            options.body = event.data.text();
-        }
+  const title   = payload.notification?.title || 'Campus Portal Update';
+  const options = {
+    body:  payload.notification?.body  || 'You have a new notification.',
+    icon:  payload.notification?.icon  || './icon.svg',
+    badge: './icon.svg',
+    data: {
+      url: payload.data?.url || './dashboard.html'
     }
+  };
 
-    event.waitUntil(self.registration.showNotification(title, options));
+  self.registration.showNotification(title, options);
 });
 
+// ── Handle notification click ──
 self.addEventListener('notificationclick', (event) => {
-    console.log('[Service Worker] Notification click Received.');
-    event.notification.close();
+  console.log('[SW] Notification clicked');
+  event.notification.close();
 
-    const targetUrl = event.notification.data.url;
-    
-    event.waitUntil(
-        clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
-            // Check if there's already a window/tab open with the target URL
-            for (let i = 0; i < clientList.length; i++) {
-                let client = clientList[i];
-                if (client.url.includes(targetUrl) && 'focus' in client) {
-                    return client.focus();
-                }
-            }
-            // If not, open a new window
-            if (clients.openWindow) {
-                return clients.openWindow(targetUrl);
-            }
-        })
-    );
+  const targetUrl = event.notification.data?.url || './dashboard.html';
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clientList) => {
+      for (const client of clientList) {
+        if (client.url.includes('dashboard') && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
 });

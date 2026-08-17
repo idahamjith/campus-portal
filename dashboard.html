@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Campus Portal — Dashboard</title>
-    <meta name="description" content="Campus Portal dashboard — View schedules, attendance, notes and announcements across all departments.">
+    <title>Campus Portal â€” Dashboard</title>
+    <meta name="description" content="Campus Portal dashboard â€” View schedules, attendance, notes and announcements across all departments.">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#4a6cf7">
     <link rel="apple-touch-icon" href="icon.svg">
     <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; frame-ancestors 'none';">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://www.gstatic.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data: https://firebasestorage.googleapis.com; connect-src 'self' https://*.googleapis.com https://*.firebaseio.com wss://*.firebaseio.com; frame-ancestors 'none';">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Material+Symbols+Outlined&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 <body>
 
 <div class="app-wrapper">
-    <!-- ═══ SIDEBAR ═══ -->
+    <!-- â•â•â• SIDEBAR â•â•â• -->
     <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <div class="logo-sm">
@@ -102,7 +102,7 @@
     <!-- Sidebar overlay (mobile) -->
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-    <!-- ═══ MAIN CONTENT ═══ -->
+    <!-- â•â•â• MAIN CONTENT â•â•â• -->
     <main class="main-content">
         <!-- Top Bar -->
         <header class="top-bar">
@@ -123,7 +123,7 @@
             </div>
         </header>
 
-        <!-- ═══ PAGE: ADMIN CONSOLE ═══ -->
+        <!-- â•â•â• PAGE: ADMIN CONSOLE â•â•â• -->
         <div class="page-panel" id="page-admin">
             <div class="page-content">
                 <div class="section-header">
@@ -163,13 +163,13 @@
                     </div>
 
                     <div class="stat-card" style="grid-column: span 12;">
-                        <h3>Upload Note</h3>
+                        <h3>Add Note Link</h3>
                         <form id="adminNoteForm" style="display: flex; flex-direction: column; gap: 12px;">
                             <input type="text" id="noteTitle" placeholder="Document Title" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
                             <input type="text" id="noteProf" placeholder="Professor Name" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
                             <input type="text" id="noteDept" placeholder="Department (e.g. cs, mech)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
-                            <input type="file" id="noteFile" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
-                            <button type="submit" class="login-btn" style="width: auto; align-self: flex-start; margin-top: 8px;"><span class="btn-text">Upload File</span></button>
+                            <input type="url" id="noteUrl" placeholder="Link to Note (e.g. Google Drive)" required style="padding: 12px; border: 1px solid var(--border-light); border-radius: 8px; width: 100%;">
+                            <button type="submit" class="login-btn" style="width: auto; align-self: flex-start; margin-top: 8px;"><span class="btn-text">Add Note Link</span></button>
                         </form>
                     </div>
 
@@ -187,7 +187,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: DASHBOARD ═══ -->
+        <!-- â•â•â• PAGE: DASHBOARD â•â•â• -->
         <div class="page-panel active" id="page-dashboard">
             <div class="page-content">
                 <!-- Stats -->
@@ -258,7 +258,7 @@
                             <div class="slot-details">
                                 <div class="slot-subject">Data Structures & Algorithms</div>
                                 <div class="slot-meta">
-                                    <span>Prof. Sharma • Room 301</span>
+                                    <span>Prof. Sharma â€¢ Room 301</span>
                                 </div>
                             </div>
                             <div class="slot-tag" style="background: rgba(99,102,241,.15); color: var(--dept-cs);">CS</div>
@@ -271,7 +271,7 @@
                             <div class="slot-details">
                                 <div class="slot-subject">Thermodynamics</div>
                                 <div class="slot-meta">
-                                    <span>Prof. Patel • Room 205</span>
+                                    <span>Prof. Patel â€¢ Room 205</span>
                                 </div>
                             </div>
                             <div class="slot-tag" style="background: rgba(245,158,11,.15); color: var(--dept-mech);">MECH</div>
@@ -284,7 +284,7 @@
                             <div class="slot-details">
                                 <div class="slot-subject">Circuit Analysis Lab</div>
                                 <div class="slot-meta">
-                                    <span>Prof. Iyer • Lab 102</span>
+                                    <span>Prof. Iyer â€¢ Lab 102</span>
                                 </div>
                             </div>
                             <div class="slot-tag" style="background: rgba(16,185,129,.15); color: var(--dept-eee);">EEE</div>
@@ -305,7 +305,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: TIMETABLE ═══ -->
+        <!-- â•â•â• PAGE: TIMETABLE â•â•â• -->
         <div class="page-panel" id="page-timetable">
             <div class="page-content">
                 <div class="dept-tabs" id="timetableTabs">
@@ -324,7 +324,7 @@
                             <div class="slot-indicator" style="background: var(--dept-cs)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Data Structures & Algorithms</div>
-                                <div class="slot-meta"><span>Prof. Sharma • Room 301</span></div>
+                                <div class="slot-meta"><span>Prof. Sharma â€¢ Room 301</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(99,102,241,.15); color: var(--dept-cs);">CS</div>
                         </div>
@@ -335,7 +335,7 @@
                             <div class="slot-indicator" style="background: var(--dept-mech)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Engineering Drawing</div>
-                                <div class="slot-meta"><span>Prof. Kumar • Room 108</span></div>
+                                <div class="slot-meta"><span>Prof. Kumar â€¢ Room 108</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(245,158,11,.15); color: var(--dept-mech);">MECH</div>
                         </div>
@@ -346,7 +346,7 @@
                             <div class="slot-indicator" style="background: var(--dept-cs)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Operating Systems</div>
-                                <div class="slot-meta"><span>Prof. Reddy • Room 302</span></div>
+                                <div class="slot-meta"><span>Prof. Reddy â€¢ Room 302</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(99,102,241,.15); color: var(--dept-cs);">CS</div>
                         </div>
@@ -357,7 +357,7 @@
                             <div class="slot-indicator" style="background: var(--dept-mech)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Thermodynamics</div>
-                                <div class="slot-meta"><span>Prof. Patel • Room 205</span></div>
+                                <div class="slot-meta"><span>Prof. Patel â€¢ Room 205</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(245,158,11,.15); color: var(--dept-mech);">MECH</div>
                         </div>
@@ -368,7 +368,7 @@
                             <div class="slot-indicator" style="background: var(--dept-eee)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Power Systems Analysis</div>
-                                <div class="slot-meta"><span>Prof. Menon • Room 110</span></div>
+                                <div class="slot-meta"><span>Prof. Menon â€¢ Room 110</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(16,185,129,.15); color: var(--dept-eee);">EEE</div>
                         </div>
@@ -379,7 +379,7 @@
                             <div class="slot-indicator" style="background: var(--dept-eee)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Circuit Analysis Lab</div>
-                                <div class="slot-meta"><span>Prof. Iyer • Lab 102</span></div>
+                                <div class="slot-meta"><span>Prof. Iyer â€¢ Lab 102</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(16,185,129,.15); color: var(--dept-eee);">EEE</div>
                         </div>
@@ -390,7 +390,7 @@
                             <div class="slot-indicator" style="background: var(--dept-civil)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Structural Mechanics</div>
-                                <div class="slot-meta"><span>Prof. Gupta • Room 401</span></div>
+                                <div class="slot-meta"><span>Prof. Gupta â€¢ Room 401</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(239,68,68,.15); color: var(--dept-civil);">CIVIL</div>
                         </div>
@@ -401,7 +401,7 @@
                             <div class="slot-indicator" style="background: var(--dept-ece)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Digital Signal Processing</div>
-                                <div class="slot-meta"><span>Prof. Nair • Room 203</span></div>
+                                <div class="slot-meta"><span>Prof. Nair â€¢ Room 203</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(139,92,246,.15); color: var(--dept-ece);">ECE</div>
                         </div>
@@ -412,7 +412,7 @@
                             <div class="slot-indicator" style="background: var(--dept-cs)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Database Management Systems</div>
-                                <div class="slot-meta"><span>Prof. Das • Room 303</span></div>
+                                <div class="slot-meta"><span>Prof. Das â€¢ Room 303</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(99,102,241,.15); color: var(--dept-cs);">CS</div>
                         </div>
@@ -423,7 +423,7 @@
                             <div class="slot-indicator" style="background: var(--dept-civil)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">Surveying & Geomatics Lab</div>
-                                <div class="slot-meta"><span>Prof. Singh • Field Lab</span></div>
+                                <div class="slot-meta"><span>Prof. Singh â€¢ Field Lab</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(239,68,68,.15); color: var(--dept-civil);">CIVIL</div>
                         </div>
@@ -434,7 +434,7 @@
                             <div class="slot-indicator" style="background: var(--dept-ece)"></div>
                             <div class="slot-details">
                                 <div class="slot-subject">VLSI Design Lab</div>
-                                <div class="slot-meta"><span>Prof. Joshi • Lab 204</span></div>
+                                <div class="slot-meta"><span>Prof. Joshi â€¢ Lab 204</span></div>
                             </div>
                             <div class="slot-tag" style="background: rgba(139,92,246,.15); color: var(--dept-ece);">ECE</div>
                         </div>
@@ -443,7 +443,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: ATTENDANCE ═══ -->
+        <!-- â•â•â• PAGE: ATTENDANCE â•â•â• -->
         <div class="page-panel" id="page-attendance">
             <div class="page-content">
                 <div class="dept-tabs" id="attendanceTabs">
@@ -548,7 +548,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: NOTES ═══ -->
+        <!-- â•â•â• PAGE: NOTES â•â•â• -->
         <div class="page-panel" id="page-notes">
             <div class="page-content">
                 <div class="dept-tabs" id="notesTabs">
@@ -566,7 +566,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: DEPARTMENT — CS ═══ -->
+        <!-- â•â•â• PAGE: DEPARTMENT â€” CS â•â•â• -->
         <div class="page-panel" id="page-dept-cs">
             <div class="page-content">
                 <div class="dept-hero dept-cs">
@@ -604,21 +604,21 @@
                     <div class="announcement-card">
                         <div class="ann-date">Aug 11, 2026</div>
                         <div class="ann-title">Hackathon: CodeStorm 2026</div>
-                        <div class="ann-body">24-hour hackathon on Sept 5-6. Team registration begins now. Prizes worth ₹50,000.</div>
+                        <div class="ann-body">24-hour hackathon on Sept 5-6. Team registration begins now. Prizes worth â‚¹50,000.</div>
                         <span class="ann-tag event">Event</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- ═══ PAGE: DEPARTMENT — MECH ═══ -->
+        <!-- â•â•â• PAGE: DEPARTMENT â€” MECH â•â•â• -->
         <div class="page-panel" id="page-dept-mech">
             <div class="page-content">
                 <div class="dept-hero dept-mech">
                     <div class="dept-hero-content">
                         <span class="dept-badge"><span class="dept-dot mech"></span> Department</span>
                         <h2>Mechanical Engineering</h2>
-                        <p>Mastering the science of motion, energy, and manufacturing — from thermodynamics to robotics and beyond.</p>
+                        <p>Mastering the science of motion, energy, and manufacturing â€” from thermodynamics to robotics and beyond.</p>
                     </div>
                 </div>
                 <div class="stats-grid stagger">
@@ -642,7 +642,7 @@
                 <div class="announcements-list stagger">
                     <div class="announcement-card">
                         <div class="ann-date">Aug 13, 2026</div>
-                        <div class="ann-title">Workshop on CAD/CAM — Registration Open</div>
+                        <div class="ann-title">Workshop on CAD/CAM â€” Registration Open</div>
                         <div class="ann-body">A 2-day workshop on Advanced CAD/CAM using SolidWorks. Aug 20-21. Limited seats.</div>
                         <span class="ann-tag event">Event</span>
                     </div>
@@ -650,7 +650,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: DEPARTMENT — EEE ═══ -->
+        <!-- â•â•â• PAGE: DEPARTMENT â€” EEE â•â•â• -->
         <div class="page-panel" id="page-dept-eee">
             <div class="page-content">
                 <div class="dept-hero dept-eee">
@@ -689,14 +689,14 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: DEPARTMENT — CIVIL ═══ -->
+        <!-- â•â•â• PAGE: DEPARTMENT â€” CIVIL â•â•â• -->
         <div class="page-panel" id="page-dept-civil">
             <div class="page-content">
                 <div class="dept-hero dept-civil">
                     <div class="dept-hero-content">
                         <span class="dept-badge"><span class="dept-dot civil"></span> Department</span>
                         <h2>Civil Engineering</h2>
-                        <p>Designing and building the infrastructure of modern civilization — bridges, highways, and sustainable structures.</p>
+                        <p>Designing and building the infrastructure of modern civilization â€” bridges, highways, and sustainable structures.</p>
                     </div>
                 </div>
                 <div class="stats-grid stagger">
@@ -728,7 +728,7 @@
             </div>
         </div>
 
-        <!-- ═══ PAGE: DEPARTMENT — ECE ═══ -->
+        <!-- â•â•â• PAGE: DEPARTMENT â€” ECE â•â•â• -->
         <div class="page-panel" id="page-dept-ece">
             <div class="page-content">
                 <div class="dept-hero dept-ece">
@@ -759,7 +759,7 @@
                 <div class="announcements-list stagger">
                     <div class="announcement-card">
                         <div class="ann-date">Aug 11, 2026</div>
-                        <div class="ann-title">Guest Lecture — 5G &amp; Beyond</div>
+                        <div class="ann-title">Guest Lecture â€” 5G &amp; Beyond</div>
                         <div class="ann-body">Dr. Ramesh from IIT will deliver a guest lecture on next-gen communication technologies. Aug 18, Seminar Hall.</div>
                         <span class="ann-tag event">Event</span>
                     </div>
@@ -769,7 +769,7 @@
 
     </main>
 
-    <!-- ═══ CHANGE PASSWORD MODAL (Dashboard) ═══ -->
+    <!-- â•â•â• CHANGE PASSWORD MODAL (Dashboard) â•â•â• -->
     <div class="cp-modal" id="dashChangePasswordModal">
         <div class="cp-overlay" id="dashCpOverlay"></div>
         <div class="cp-card">
@@ -862,341 +862,223 @@
     </div>
 </div>
 
-<script>
-  // ══════════════════════════════════════════════════════════
-  // SESSION GUARD — runs immediately, blocks non-logged-in users
-  // • Validates session integrity checksum
-  // • Checks session expiry
-  // • Auto-logout after 30 min of inactivity
-  // • Clears all traces on logout
-  // ══════════════════════════════════════════════════════════
-  (function() {
-    'use strict';
+<script type="module">
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  // SESSION GUARD â€” Firebase Auth (replaces sessionStorage guard)
+  // Redirects to login if user is not authenticated.
+  // Populates UI from Firestore user profile.
+  // Handles logout + dashboard change-password with Firebase.
+  // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+  import { auth, db } from './js/firebase-init.js';
+  import { onAuthStateChanged, signOut, updatePassword, reauthenticateWithCredential, EmailAuthProvider } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { doc, getDoc, updateDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-    const SESSION_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes
-    const MIN_PASSWORD_LENGTH = 4;
-    const MAX_PASSWORD_LENGTH = 32;
-    const DEFAULT_PASSWORD_HASH = '03ac674216f3e15c761ee1a5e255f067953623c8b388b4459e13f978d7c846f4';
+  const MIN_PASSWORD_LENGTH = 4;
+  const MAX_PASSWORD_LENGTH = 32;
+  const SESSION_TIMEOUT_MS  = 30 * 60 * 1000;
 
-    // ── SHA-256 hashing ──
-    async function sha256(message) {
-      const msgBuffer = new TextEncoder().encode(message);
-      const hashBuffer = await crypto.subtle.digest('SHA-256', msgBuffer);
-      const hashArray = Array.from(new Uint8Array(hashBuffer));
-      return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-    }
+  // â”€â”€ Password strength checker â”€â”€
+  function checkPasswordStrength(password) {
+    let score = 0;
+    if (password.length >= 4) score++;
+    if (password.length >= 8) score++;
+    if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
+    if (/\d/.test(password)) score++;
+    if (/[^a-zA-Z0-9]/.test(password)) score++;
+    const levels = [
+      { label: 'Too short', color: '#ef4444', width: '5%'  },
+      { label: 'Weak',      color: '#ef4444', width: '20%' },
+      { label: 'Fair',      color: '#f59e0b', width: '40%' },
+      { label: 'Good',      color: '#f59e0b', width: '60%' },
+      { label: 'Strong',    color: '#10b981', width: '80%' },
+      { label: 'Excellent', color: '#10b981', width: '100%'}
+    ];
+    return levels[Math.min(score, levels.length - 1)];
+  }
 
-    // ── Custom password storage (localStorage, keyed per user) ──
-    function getStoredPasswordHash(username) {
-      try {
-        const store = JSON.parse(localStorage.getItem('campus_portal_passwords') || '{}');
-        return store[username] || null;
-      } catch (e) {
-        return null;
-      }
-    }
+  function getInitials(name) {
+    const parts = String(name || '').trim().split(/\s+/);
+    if (parts.length >= 2) return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+    return String(name || '??').substring(0, 2).toUpperCase();
+  }
 
-    function setStoredPasswordHash(username, hash) {
-      try {
-        const store = JSON.parse(localStorage.getItem('campus_portal_passwords') || '{}');
-        store[username] = hash;
-        localStorage.setItem('campus_portal_passwords', JSON.stringify(store));
-      } catch (e) { /* ignore */ }
-    }
+  // â”€â”€ Secure logout â”€â”€
+  async function secureLogout() {
+    try { await signOut(auth); } catch(e) { /* ignore */ }
+    window.location.href = 'index.html';
+  }
 
-    // ── Password strength checker ──
-    function checkPasswordStrength(password) {
-      let score = 0;
-      if (password.length >= 4) score++;
-      if (password.length >= 8) score++;
-      if (/[a-z]/.test(password) && /[A-Z]/.test(password)) score++;
-      if (/\d/.test(password)) score++;
-      if (/[^a-zA-Z0-9]/.test(password)) score++;
-
-      const levels = [
-        { label: 'Too short', color: '#ef4444', width: '5%' },
-        { label: 'Weak', color: '#ef4444', width: '20%' },
-        { label: 'Fair', color: '#f59e0b', width: '40%' },
-        { label: 'Good', color: '#f59e0b', width: '60%' },
-        { label: 'Strong', color: '#10b981', width: '80%' },
-        { label: 'Excellent', color: '#10b981', width: '100%' }
-      ];
-
-      return levels[Math.min(score, levels.length - 1)];
-    }
-
-    // ── Regenerate checksum to verify session wasn't tampered ──
-    function generateChecksum(s) {
-      const raw = s.id + '|' + s.name + '|' + s.dept + '|' + s.role + '|' + s.createdAt + '|' + s.expiresAt + '|campus_portal_v1';
-      var hash = 0;
-      for (var i = 0; i < raw.length; i++) {
-        hash = ((hash << 5) - hash) + raw.charCodeAt(i);
-        hash = hash & hash;
-      }
-      return Math.abs(hash).toString(36);
-    }
-
-    // ── Validate session ──
-    function validateSession(session) {
-      if (!session || typeof session !== 'object') return false;
-      if (!session.id || !session.name || !session.dept || !session.expiresAt) return false;
-      if (Date.now() > session.expiresAt) return false;
-      if (session.checksum !== generateChecksum(session)) return false;
-      return true;
-    }
-
-    // ── Secure logout ──
-    function secureLogout() {
-      sessionStorage.removeItem('campus_portal_user');
-      sessionStorage.removeItem('campus_portal_lockout');
-      window.location.href = 'index.html';
-    }
-
-    // ── Load & validate session ──
-    var raw = null;
-    try {
-      raw = sessionStorage.getItem('campus_portal_user');
-    } catch (e) {
+  // â”€â”€ Inactivity timer â”€â”€
+  let inactivityTimer;
+  function resetInactivityTimer() {
+    clearTimeout(inactivityTimer);
+    inactivityTimer = setTimeout(() => {
+      alert('Session expired due to inactivity. You will be logged out.');
       secureLogout();
-      return;
-    }
+    }, SESSION_TIMEOUT_MS);
+  }
+  ['mousemove','keydown','mousedown','scroll','touchstart'].forEach(evt => {
+    document.addEventListener(evt, resetInactivityTimer, { passive: true });
+  });
 
-    if (!raw) {
+  // â”€â”€ Firebase Auth state observer â”€â”€
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
       window.location.href = 'index.html';
       return;
     }
 
-    var user;
+    // Load user profile from Firestore
+    let profile = { name: user.email, deptName: 'Student', role: 'student' };
     try {
-      user = JSON.parse(raw);
-    } catch (e) {
-      secureLogout();
-      return;
+      const snap = await getDoc(doc(db, 'users', user.uid));
+      if (snap.exists()) profile = { ...profile, ...snap.data() };
+    } catch(e) { console.warn('Could not load user profile:', e); }
+
+    // Populate sidebar user card
+    document.getElementById('userAvatar').textContent = getInitials(profile.name);
+    document.getElementById('userName').textContent   = String(profile.name    || 'Student').substring(0, 50);
+    document.getElementById('userDept').textContent   = String(profile.deptName || 'Department').substring(0, 50);
+
+    // Show admin nav if admin
+    if (profile.role === 'admin') {
+      const titleEl = document.getElementById('nav-admin-title');
+      const itemEl  = document.getElementById('nav-admin');
+      if (titleEl) titleEl.style.display = 'block';
+      if (itemEl)  itemEl.style.display  = 'flex';
     }
 
-    if (!validateSession(user)) {
-      secureLogout();
-      return;
-    }
-
-    // ── Populate user info (textContent only — XSS safe) ──
-    document.getElementById('userAvatar').textContent = String(user.initials || '??').substring(0, 2);
-    document.getElementById('userName').textContent = String(user.name || 'Student').substring(0, 50);
-    document.getElementById('userDept').textContent = String(user.deptName || 'Department').substring(0, 50);
-
-    // ── Logout button ──
+    // Logout button
     document.getElementById('logoutBtn').addEventListener('click', secureLogout);
 
-    // ══════════════════════════════════════════════════════════
-    // CHANGE PASSWORD (Dashboard)
-    // ══════════════════════════════════════════════════════════
+    // Start inactivity timer
+    resetInactivityTimer();
 
-    const cpModal = document.getElementById('dashChangePasswordModal');
-    const cpOverlay = document.getElementById('dashCpOverlay');
-    const cpForm = document.getElementById('dashCpForm');
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    // CHANGE PASSWORD MODAL (Dashboard)
+    // â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+    const cpModal           = document.getElementById('dashChangePasswordModal');
+    const cpOverlay         = document.getElementById('dashCpOverlay');
+    const cpForm            = document.getElementById('dashCpForm');
     const cpCurrentPassword = document.getElementById('dashCpCurrentPassword');
-    const cpNewPassword = document.getElementById('dashCpNewPassword');
+    const cpNewPassword     = document.getElementById('dashCpNewPassword');
     const cpConfirmPassword = document.getElementById('dashCpConfirmPassword');
-    const cpError = document.getElementById('dashCpError');
-    const cpErrorText = document.getElementById('dashCpErrorText');
-    const cpSuccess = document.getElementById('dashCpSuccess');
-    const cpSuccessText = document.getElementById('dashCpSuccessText');
-    const cpSubmitBtn = document.getElementById('dashCpSubmitBtn');
-    const cpCancelBtn = document.getElementById('dashCpCancelBtn');
-    const cpStrengthBar = document.getElementById('dashCpStrengthBar');
-    const cpStrengthText = document.getElementById('dashCpStrengthText');
+    const cpError           = document.getElementById('dashCpError');
+    const cpErrorText       = document.getElementById('dashCpErrorText');
+    const cpSuccess         = document.getElementById('dashCpSuccess');
+    const cpSubmitBtn       = document.getElementById('dashCpSubmitBtn');
+    const cpCancelBtn       = document.getElementById('dashCpCancelBtn');
+    const cpStrengthBar     = document.getElementById('dashCpStrengthBar');
+    const cpStrengthText    = document.getElementById('dashCpStrengthText');
     const changePasswordBtn = document.getElementById('changePasswordBtn');
-
-    // Extract username from session user id (e.g., "CS001" → "cs001")
-    const currentUsername = String(user.id || '').toLowerCase();
 
     function showCpModal() {
       cpModal.classList.add('active');
       cpCurrentPassword.value = '';
-      cpNewPassword.value = '';
+      cpNewPassword.value     = '';
       cpConfirmPassword.value = '';
       cpError.classList.remove('visible');
       cpSuccess.classList.remove('visible');
       cpStrengthBar.style.width = '0%';
       cpStrengthText.textContent = '';
-      cpSubmitBtn.classList.remove('loading', 'success');
+      cpSubmitBtn.classList.remove('loading','success');
       cpSubmitBtn.querySelector('.btn-text').textContent = 'Change Password';
-      setTimeout(function() { cpCurrentPassword.focus(); }, 300);
+      setTimeout(() => cpCurrentPassword.focus(), 300);
     }
 
-    function hideCpModal() {
-      cpModal.classList.remove('active');
-    }
+    function hideCpModal() { cpModal.classList.remove('active'); }
 
-    // Open modal
     changePasswordBtn.addEventListener('click', showCpModal);
-
-    // Close modal
     cpOverlay.addEventListener('click', hideCpModal);
     cpCancelBtn.addEventListener('click', hideCpModal);
-
-    // Escape key closes modal
-    document.addEventListener('keydown', function(e) {
-      if (e.key === 'Escape' && cpModal.classList.contains('active')) {
-        hideCpModal();
-      }
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && cpModal.classList.contains('active')) hideCpModal();
     });
 
-    // Password strength live indicator
-    cpNewPassword.addEventListener('input', function() {
-      var pw = cpNewPassword.value;
-      if (pw.length === 0) {
-        cpStrengthBar.style.width = '0%';
-        cpStrengthText.textContent = '';
-        return;
-      }
-      var strength = checkPasswordStrength(pw);
-      cpStrengthBar.style.width = strength.width;
-      cpStrengthBar.style.background = strength.color;
-      cpStrengthText.textContent = strength.label;
-      cpStrengthText.style.color = strength.color;
+    // Live strength meter
+    cpNewPassword.addEventListener('input', () => {
+      const pw = cpNewPassword.value;
+      if (!pw) { cpStrengthBar.style.width = '0%'; cpStrengthText.textContent = ''; return; }
+      const s = checkPasswordStrength(pw);
+      cpStrengthBar.style.width    = s.width;
+      cpStrengthBar.style.background = s.color;
+      cpStrengthText.textContent   = s.label;
+      cpStrengthText.style.color   = s.color;
     });
 
-    // Toggle password visibility in modal
-    document.querySelectorAll('.dash-cp-toggle-pw').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        var input = btn.previousElementSibling;
-        var isPassword = input.type === 'password';
+    // Toggle password visibility
+    document.querySelectorAll('.dash-cp-toggle-pw').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const input = btn.previousElementSibling;
+        const isPassword = input.type === 'password';
         input.type = isPassword ? 'text' : 'password';
         btn.querySelector('.material-symbols-outlined').textContent =
           isPassword ? 'visibility_off' : 'visibility';
       });
     });
 
-    // Clear errors on input
-    [cpCurrentPassword, cpNewPassword, cpConfirmPassword].forEach(function(input) {
-      input.addEventListener('input', function() {
+    [cpCurrentPassword, cpNewPassword, cpConfirmPassword].forEach(input => {
+      input.addEventListener('input', () => {
         cpError.classList.remove('visible');
         cpSuccess.classList.remove('visible');
       });
     });
 
-    // Form submit
-    cpForm.addEventListener('submit', async function(e) {
+    // Change password form submit
+    cpForm.addEventListener('submit', async e => {
       e.preventDefault();
+      const currentPw = cpCurrentPassword.value;
+      const newPw     = cpNewPassword.value;
+      const confirmPw = cpConfirmPassword.value;
 
-      var currentPw = cpCurrentPassword.value;
-      var newPw = cpNewPassword.value;
-      var confirmPw = cpConfirmPassword.value;
-
-      // Validate current password
       if (!currentPw) {
         cpErrorText.textContent = 'Please enter your current password.';
-        cpError.classList.add('visible');
-        return;
+        cpError.classList.add('visible'); return;
       }
-
-      // Validate new password length
       if (newPw.length < MIN_PASSWORD_LENGTH) {
-        cpErrorText.textContent = 'New password must be at least ' + MIN_PASSWORD_LENGTH + ' characters.';
-        cpError.classList.add('visible');
-        return;
+        cpErrorText.textContent = `New password must be at least ${MIN_PASSWORD_LENGTH} characters.`;
+        cpError.classList.add('visible'); return;
       }
-
       if (newPw.length > MAX_PASSWORD_LENGTH) {
-        cpErrorText.textContent = 'New password must be at most ' + MAX_PASSWORD_LENGTH + ' characters.';
-        cpError.classList.add('visible');
-        return;
+        cpErrorText.textContent = `New password must be at most ${MAX_PASSWORD_LENGTH} characters.`;
+        cpError.classList.add('visible'); return;
       }
-
-      // Confirm match
       if (newPw !== confirmPw) {
         cpErrorText.textContent = 'New passwords do not match.';
-        cpError.classList.add('visible');
-        return;
+        cpError.classList.add('visible'); return;
+      }
+      if (newPw === currentPw) {
+        cpErrorText.textContent = 'New password must be different from your current password.';
+        cpError.classList.add('visible'); return;
       }
 
       cpSubmitBtn.classList.add('loading');
-
-      // Hash passwords
-      var currentHash, newHash;
       try {
-        currentHash = await sha256(currentPw);
-        newHash = await sha256(newPw);
+        // Re-authenticate first (Firebase requires this before password change)
+        const credential = EmailAuthProvider.credential(user.email, currentPw);
+        await reauthenticateWithCredential(user, credential);
+        await updatePassword(user, newPw);
+
+        cpSubmitBtn.classList.remove('loading');
+        cpSubmitBtn.classList.add('success');
+        cpSubmitBtn.querySelector('.btn-text').textContent = 'Password Changed!';
+        cpError.classList.remove('visible');
+        cpSuccess.classList.add('visible');
+        setTimeout(hideCpModal, 1500);
       } catch (err) {
-        cpErrorText.textContent = 'Hashing error. Please try again.';
-        cpError.classList.add('visible');
         cpSubmitBtn.classList.remove('loading');
-        return;
-      }
-
-      // Verify current password
-      var storedHash = getStoredPasswordHash(currentUsername);
-      var expectedHash = storedHash || DEFAULT_PASSWORD_HASH;
-
-      if (currentHash !== expectedHash) {
-        cpErrorText.textContent = 'Current password is incorrect.';
+        if (err.code === 'auth/wrong-password' || err.code === 'auth/invalid-credential') {
+          cpErrorText.textContent = 'Current password is incorrect.';
+        } else {
+          cpErrorText.textContent = 'Failed to change password. Please try again.';
+        }
         cpError.classList.add('visible');
-        cpSubmitBtn.classList.remove('loading');
-        return;
       }
-
-      // Check new password isn't same as current
-      if (newHash === currentHash) {
-        cpErrorText.textContent = 'New password must be different from your current password.';
-        cpError.classList.add('visible');
-        cpSubmitBtn.classList.remove('loading');
-        return;
-      }
-
-      // Check not reverting to default
-      if (newHash === DEFAULT_PASSWORD_HASH) {
-        cpErrorText.textContent = 'Please choose a different password than the default.';
-        cpError.classList.add('visible');
-        cpSubmitBtn.classList.remove('loading');
-        return;
-      }
-
-      // Save new password
-      setStoredPasswordHash(currentUsername, newHash);
-
-      // Show success
-      cpSubmitBtn.classList.remove('loading');
-      cpSubmitBtn.classList.add('success');
-      cpSubmitBtn.querySelector('.btn-text').textContent = 'Password Changed!';
-      cpError.classList.remove('visible');
-      cpSuccess.classList.add('visible');
-
-      // Close modal after a short delay
-      setTimeout(function() {
-        hideCpModal();
-      }, 1500);
     });
-
-    // ── Auto-logout on inactivity ──
-    var inactivityTimer;
-    function resetInactivityTimer() {
-      clearTimeout(inactivityTimer);
-      inactivityTimer = setTimeout(function() {
-        alert('Session expired due to inactivity. You will be logged out.');
-        secureLogout();
-      }, SESSION_TIMEOUT_MS);
-    }
-
-    ['mousemove', 'keydown', 'mousedown', 'scroll', 'touchstart'].forEach(function(evt) {
-      document.addEventListener(evt, resetInactivityTimer, { passive: true });
-    });
-    resetInactivityTimer();
-
-    // ── Log out when tab/window is closed ──
-    window.addEventListener('beforeunload', function() {
-      // Session is in sessionStorage so it auto-clears on browser close,
-      // but we also update the expiry timestamp
-      try {
-        user.expiresAt = Date.now() + SESSION_TIMEOUT_MS;
-        user.checksum = generateChecksum(user);
-        sessionStorage.setItem('campus_portal_user', JSON.stringify(user));
-      } catch(e) { /* ignore */ }
-    });
-
-  })();
+  });
 </script>
-<script src="js/app.js"></script>
-<script src="js/push.js"></script>
+
+<script type="module" src="js/app.js"></script>
+<script type="module" src="js/push.js"></script>
 </body>
 </html>

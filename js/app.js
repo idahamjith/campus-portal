@@ -1,3 +1,6 @@
+import { db } from './firebase-init.js';
+import { collection, getDocs, addDoc, query, orderBy } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
 /* ═══════════════════════════════════════════════════════════
    CAMPUS PORTAL — Application Logic
    Navigation, tab filtering, sidebar toggle, and animations
@@ -199,37 +202,27 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Initialize ──
-  // Check role to show Admin UI
-  try {
-    const sessionRaw = sessionStorage.getItem('campus_portal_user');
-    if (sessionRaw) {
-      const session = JSON.parse(sessionRaw);
-      if (session.role === 'admin') {
-        const titleEl = document.getElementById('nav-admin-title');
-        const itemEl = document.getElementById('nav-admin');
-        if (titleEl) titleEl.style.display = 'block';
-        if (itemEl) itemEl.style.display = 'flex';
-      }
-    }
-  } catch (e) { /* ignore */ }
+  // Admin nav is shown by the dashboard session guard (inline module script).
+  // app.js simply animates the attendance bars on load.
+
 
   // Animate attendance bars on initial load if attendance is visible
   animateAttendanceBars();
 
-  // ── API Fetch & Render Logic ──
+  // ── API Fetch & Render Logic (FIREBASE) ──
   
   async function fetchAnnouncements() {
     try {
-      const res = await fetch('/api/announcements');
-      if (!res.ok) return;
-      const data = await res.json();
+      const q = query(collection(db, "announcements"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
       const container = document.getElementById('dynamicAnnouncements');
       if (!container) return;
       container.innerHTML = '';
-      if (data.length === 0) {
+      if (querySnapshot.empty) {
         container.innerHTML = '<p style="color: var(--text-secondary);">No announcements yet.</p>';
       }
-      data.forEach(ann => {
+      querySnapshot.forEach((docSnap) => {
+        const ann = docSnap.data();
         container.innerHTML += `
           <div class="announcement-card">
               <div class="ann-date">${ann.date} • ${ann.department}</div>
@@ -246,16 +239,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchNotes() {
     try {
-      const res = await fetch('/api/notes');
-      if (!res.ok) return;
-      const data = await res.json();
+      const q = query(collection(db, "notes"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
       const container = document.getElementById('dynamicNotes');
       if (!container) return;
       container.innerHTML = '';
-      if (data.length === 0) {
+      if (querySnapshot.empty) {
         container.innerHTML = '<p style="color: var(--text-secondary);">No notes uploaded yet.</p>';
       }
-      data.forEach(note => {
+      querySnapshot.forEach((docSnap) => {
+        const note = docSnap.data();
         container.innerHTML += `
           <div class="note-card" data-dept-filter="${note.department}">
               <div class="note-icon pdf"><span class="material-symbols-outlined">description</span></div>
@@ -276,16 +269,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   async function fetchVideos() {
     try {
-      const res = await fetch('/api/videos');
-      if (!res.ok) return;
-      const data = await res.json();
+      const q = query(collection(db, "videos"), orderBy("createdAt", "desc"));
+      const querySnapshot = await getDocs(q);
       const container = document.getElementById('dynamicVideos');
       if (!container) return;
       container.innerHTML = '';
-      if (data.length === 0) {
+      if (querySnapshot.empty) {
         container.innerHTML = '<p style="color: var(--text-secondary);">No videos added yet.</p>';
       }
-      data.forEach(video => {
+      querySnapshot.forEach((docSnap) => {
+        const video = docSnap.data();
         container.innerHTML += `
           <div class="note-card" data-dept-filter="${video.department}">
               <div class="note-icon link"><span class="material-symbols-outlined">play_circle</span></div>
@@ -316,21 +309,27 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const btn = annForm.querySelector('button');
       btn.classList.add('loading');
+      
       const payload = {
         title: document.getElementById('annTitle').value,
         body: document.getElementById('annBody').value,
         department: document.getElementById('annDept').value,
-        tag: document.getElementById('annTag').value
+        tag: document.getElementById('annTag').value,
+        date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+        createdAt: Date.now()
       };
-      await fetch('/api/announcements', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      annForm.reset();
-      btn.classList.remove('loading');
-      fetchAnnouncements();
-      alert('Announcement posted!');
+      
+      try {
+        await addDoc(collection(db, "announcements"), payload);
+        annForm.reset();
+        fetchAnnouncements();
+        alert('Announcement posted!');
+      } catch (err) {
+        console.error(err);
+        alert('Error posting announcement');
+      } finally {
+        btn.classList.remove('loading');
+      }
     });
   }
 
@@ -340,21 +339,27 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const btn = videoForm.querySelector('button');
       btn.classList.add('loading');
+      
       const payload = {
         title: document.getElementById('videoTitle').value,
         description: document.getElementById('videoDesc').value,
         department: document.getElementById('videoDept').value,
-        url: document.getElementById('videoUrl').value
+        url: document.getElementById('videoUrl').value,
+        upload_date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+        createdAt: Date.now()
       };
-      await fetch('/api/videos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      });
-      videoForm.reset();
-      btn.classList.remove('loading');
-      fetchVideos();
-      alert('Video added!');
+      
+      try {
+        await addDoc(collection(db, "videos"), payload);
+        videoForm.reset();
+        fetchVideos();
+        alert('Video added!');
+      } catch (err) {
+        console.error(err);
+        alert('Error adding video');
+      } finally {
+        btn.classList.remove('loading');
+      }
     });
   }
 
@@ -364,20 +369,29 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       const btn = noteForm.querySelector('button');
       btn.classList.add('loading');
-      const formData = new FormData();
-      formData.append('title', document.getElementById('noteTitle').value);
-      formData.append('professor', document.getElementById('noteProf').value);
-      formData.append('department', document.getElementById('noteDept').value);
-      formData.append('noteFile', document.getElementById('noteFile').files[0]);
       
-      await fetch('/api/notes', {
-        method: 'POST',
-        body: formData // Note: no Content-Type header needed for FormData
-      });
-      noteForm.reset();
-      btn.classList.remove('loading');
-      fetchNotes();
-      alert('Note uploaded!');
+      try {
+        const payload = {
+          title: document.getElementById('noteTitle').value,
+          professor: document.getElementById('noteProf').value,
+          department: document.getElementById('noteDept').value,
+          file_path: document.getElementById('noteUrl').value,
+          file_size: "External Link",
+          upload_date: new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }),
+          createdAt: Date.now()
+        };
+        
+        // Save metadata to Firestore
+        await addDoc(collection(db, "notes"), payload);
+        noteForm.reset();
+        fetchNotes();
+        alert('Note link added!');
+      } catch (err) {
+        console.error(err);
+        alert('Error adding note link');
+      } finally {
+        btn.classList.remove('loading');
+      }
     });
   }
 

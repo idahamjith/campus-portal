@@ -1,117 +1,143 @@
-// Push Notification and Service Worker Registration
+/* ═══════════════════════════════════════════════════════════
+   CAMPUS PORTAL — Push Notifications (Firebase Cloud Messaging)
+   Replaces the dead /api/subscribe + /api/sendPush Node.js backend.
+   FCM tokens are saved to Firestore fcm_tokens collection.
+   Admin sends broadcasts via Firebase Console (free, no Cloud Functions).
+   ═══════════════════════════════════════════════════════════ */
 
-// Replace with your VAPID Public Key from your backend
-const PUBLIC_VAPID_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLj8eLlsnCpo';
+import { messaging, auth, db } from './firebase-init.js';
+import { getToken, onMessage } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-messaging.js";
+import { doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import { onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
 
-function urlBase64ToUint8Array(base64String) {
-    const padding = '='.repeat((4 - base64String.length % 4) % 4);
-    const base64 = (base64String + padding)
-        .replace(/\-/g, '+')
-        .replace(/_/g, '/');
+// Your VAPID public key from Firebase Console → Project Settings → Cloud Messaging
+// Replace this with YOUR key from: Firebase Console → Project Settings → Cloud Messaging → Web Push certificates
+const VAPID_KEY = 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLj8eLlsnCpo';
 
-    const rawData = window.atob(base64);
-    const outputArray = new Uint8Array(rawData.length);
-
-    for (let i = 0; i < rawData.length; ++i) {
-        outputArray[i] = rawData.charCodeAt(i);
-    }
-    return outputArray;
-}
-
+// ── Register service worker ──
 async function registerServiceWorker() {
-    if ('serviceWorker' in navigator && 'PushManager' in window) {
-        try {
-            const registration = await navigator.serviceWorker.register('./sw.js');
-            console.log('Service Worker registered with scope:', registration.scope);
-            return registration;
-        } catch (error) {
-            console.error('Service Worker registration failed:', error);
-            return null;
-        }
-    } else {
-        console.warn('Push messaging is not supported');
-        return null;
-    }
+  if (!('serviceWorker' in navigator)) {
+    console.warn('Service Workers not supported');
+    return null;
+  }
+  try {
+    const reg = await navigator.serviceWorker.register('./sw.js');
+    console.log('[FCM] Service Worker registered, scope:', reg.scope);
+    return reg;
+  } catch (err) {
+    console.error('[FCM] Service Worker registration failed:', err);
+    return null;
+  }
 }
 
-async function subscribeUserToPush() {
+// ── Get FCM token and save to Firestore ──
+async function subscribeUserToPush(user) {
+  if (!messaging) {
+    console.warn('[FCM] Messaging not available (requires HTTPS)');
+    return;
+  }
+  try {
     const registration = await navigator.serviceWorker.ready;
-    
-    try {
-        const existingSubscription = await registration.pushManager.getSubscription();
-        if (existingSubscription) {
-            console.log('User is already subscribed:', existingSubscription);
-            return existingSubscription;
-        }
+    const token = await getToken(messaging, {
+      vapidKey: VAPID_KEY,
+      serviceWorkerRegistration: registration
+    });
 
-        const subscribeOptions = {
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(PUBLIC_VAPID_KEY)
-        };
-
-        const subscription = await registration.pushManager.subscribe(subscribeOptions);
-        console.log('User is subscribed:', subscription);
-        
-        // Send subscription to the Node.js backend
-        await fetch('/api/subscribe', {
-            method: 'POST',
-            body: JSON.stringify(subscription),
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        
-        return subscription;
-    } catch (error) {
-        console.error('Failed to subscribe the user: ', error);
-        return null;
-    }
-}
-
-async function requestNotificationPermission() {
-    const permission = await Notification.requestPermission();
-    if (permission === 'granted') {
-        console.log('Notification permission granted.');
-        await subscribeUserToPush();
-        alert('Push notifications enabled successfully!');
+    if (token) {
+      console.log('[FCM] Token obtained:', token.substring(0, 20) + '...');
+      // Save token to Firestore (keyed by token, tagged with user uid)
+      await setDoc(doc(db, 'fcm_tokens', token), {
+        token,
+        uid: user.uid,
+        updatedAt: serverTimestamp()
+      });
+      console.log('[FCM] Token saved to Firestore');
+      return token;
     } else {
-        console.warn('Notification permission denied.');
-        alert('Please enable notifications in your browser settings to receive updates.');
+      console.warn('[FCM] No token received — notification permission may be denied');
     }
+  } catch (err) {
+    console.error('[FCM] Error getting token:', err);
+  }
 }
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', async () => {
-    const registration = await registerServiceWorker();
-});
-
-// Expose a global function to trigger permission request from a UI button
-window.enablePushNotifications = requestNotificationPermission;
-
-// Admin function to send a broadcast push
-window.sendAdminPush = async function() {
-    const title = document.getElementById('pushTitle').value;
-    const body = document.getElementById('pushBody').value;
-    const btn = document.getElementById('sendPushBtn');
-
-    btn.classList.add('loading');
-    try {
-        const response = await fetch('/api/sendPush', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ title, body })
-        });
-        const result = await response.json();
-        if (result.success) {
-            alert('Push broadcast sent successfully to ' + result.sent + ' devices!');
-            document.getElementById('adminPushForm').reset();
-        } else {
-            alert('Failed to send broadcast.');
-        }
-    } catch (error) {
-        console.error('Push error:', error);
-        alert('Error communicating with backend.');
-    } finally {
-        btn.classList.remove('loading');
+// ── Handle foreground messages (app is open) ──
+function setupForegroundMessages() {
+  if (!messaging) return;
+  onMessage(messaging, (payload) => {
+    console.log('[FCM] Foreground message received:', payload);
+    const { title, body } = payload.notification || {};
+    if (title && Notification.permission === 'granted') {
+      new Notification(title, {
+        body: body || '',
+        icon: './icon.svg',
+        badge: './icon.svg'
+      });
     }
+  });
+}
+
+// ── Request notification permission and subscribe ──
+window.enablePushNotifications = async function() {
+  if (!('Notification' in window)) {
+    alert('Push notifications are not supported in this browser.');
+    return;
+  }
+
+  const permission = await Notification.requestPermission();
+  if (permission !== 'granted') {
+    alert('Please enable notifications in your browser settings to receive updates.');
+    return;
+  }
+
+  // Get the current Firebase user and subscribe
+  const user = auth.currentUser;
+  if (!user) {
+    alert('Please sign in to enable push notifications.');
+    return;
+  }
+
+  await subscribeUserToPush(user);
+  alert('Push notifications enabled! You will now receive campus updates.');
 };
+
+// ── Admin broadcast push (writes to Firestore push_queue) ──
+// NOTE: Since we're on the free Spark plan (no Cloud Functions),
+// admins send broadcasts directly from Firebase Console:
+// Firebase Console → Engage → Messaging → New Campaign
+//
+// The button below is kept for UI completeness but shows instructions.
+window.sendAdminPush = async function() {
+  const title = document.getElementById('pushTitle')?.value?.trim();
+  const body  = document.getElementById('pushBody')?.value?.trim();
+  const btn   = document.getElementById('sendPushBtn');
+
+  if (!title || !body) {
+    alert('Please enter a title and message.');
+    return;
+  }
+
+  // Show instructions for sending via Firebase Console
+  alert(
+    `To send a broadcast notification:\n\n` +
+    `1. Go to Firebase Console (console.firebase.google.com)\n` +
+    `2. Select your project → Engage → Messaging\n` +
+    `3. Create a new campaign with:\n   Title: "${title}"\n   Body: "${body}"\n` +
+    `4. Target: All users (or by topic)\n` +
+    `5. Send now\n\n` +
+    `This is free and unlimited on the Firebase Spark plan.`
+  );
+};
+
+// ── Initialize on load ──
+document.addEventListener('DOMContentLoaded', async () => {
+  await registerServiceWorker();
+  setupForegroundMessages();
+
+  // Auto-subscribe if user is already signed in and notifications are granted
+  onAuthStateChanged(auth, async (user) => {
+    if (user && Notification.permission === 'granted') {
+      await subscribeUserToPush(user);
+    }
+  });
+});

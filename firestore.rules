@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Announcements: anyone authenticated can read, only admin can write ──
+    match /announcements/{docId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── Notes: anyone authenticated can read, only admin can write ──
+    match /notes/{docId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── Videos: anyone authenticated can read, only admin can write ──
+    match /videos/{docId} {
+      allow read: if request.auth != null;
+      allow create, update, delete: if request.auth != null
+        && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin';
+    }
+
+    // ── User profiles: each user can read/update their own doc ──
+    match /users/{userId} {
+      allow read: if request.auth != null && request.auth.uid == userId;
+      allow update: if request.auth != null && request.auth.uid == userId
+        // Users can only update mustChangePassword to false and their own safe fields
+        && !('role' in request.resource.data.diff(resource.data).affectedKeys());
+      // Only admin script (server-side) creates user docs
+      allow create: if false;
+    }
+
+    // ── FCM tokens: authenticated users can save/update their own token ──
+    match /fcm_tokens/{tokenId} {
+      allow read, write: if request.auth != null;
+    }
+
+    // ── Deny everything else ──
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
