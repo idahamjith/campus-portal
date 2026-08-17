@@ -78,16 +78,16 @@ async function sendFcmMessage(projectId, accessToken, token, title, body) {
       },
       webpush: {
         notification: {
-          icon: '/icon.svg'
+          icon: 'https://idahamjith.github.io/campus-portal/icon.svg'
         },
         fcm_options: {
-          link: '/dashboard.html'
+          link: 'https://idahamjith.github.io/campus-portal/dashboard.html'
         }
       },
       data: {
         title: title,
         body: body,
-        url: './dashboard.html'
+        url: 'https://idahamjith.github.io/campus-portal/dashboard.html'
       }
     }
   };
